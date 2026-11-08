@@ -16,24 +16,34 @@ interface Shown {
  * table shows the state as of that event. `busy` stays true until the screen
  * has caught up with the real state.
  */
-export function usePresentation(view: GameView, events: GameEvent[], names: string[]) {
+export function usePresentation(
+  view: GameView,
+  events: GameEvent[],
+  names: string[],
+  onShow?: (event: GameEvent) => void,
+) {
   const [shown, setShown] = useState<Shown>(() => ({
     view,
     index: events.length,
     announcement: null,
     playing: null,
   }))
-  const latest = useRef({ view, events, names })
+  const latest = useRef({ view, events, names, onShow })
   // The last state shown with nothing queued: where the next queue starts from.
   const idle = useRef(view)
   const pending = shown.index < events.length
   const busy = shown.playing !== null || pending
   useEffect(() => {
-    latest.current = { view, events, names }
+    latest.current = { view, events, names, onShow }
     if (!busy) idle.current = view
   })
 
   const delay = shown.playing ? eventDuration(shown.playing, view.seat) : pending ? 0 : null
+
+  // Side effects of showing an event (a sound) run once per event.
+  useEffect(() => {
+    if (shown.playing) latest.current.onShow?.(shown.playing)
+  }, [shown.playing])
 
   useEffect(() => {
     if (delay === null) return

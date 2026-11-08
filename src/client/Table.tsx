@@ -12,6 +12,10 @@ import {
 import { CardBack, CardButton, CardView } from './Card.tsx'
 import { Fosforos } from './Fosforos.tsx'
 import { actionLabel, eventText, scoreText } from './text.ts'
+import { useState } from 'react'
+import { Volume2, VolumeX } from 'lucide-react'
+import { playSound } from './sound.ts'
+import { saveMuted, savedMuted } from './storage.ts'
 import { usePresentation } from './usePresentation.ts'
 
 interface Props {
@@ -29,7 +33,15 @@ interface Props {
 const tilt = (deg: number) => ({ '--tilt': `${deg}deg` }) as CSSProperties
 
 export function Table({ view: realView, names, events, onAction, rivalStatus, over }: Props) {
-  const { view, busy, announcement, shownEvents } = usePresentation(realView, events, names)
+  const [muted, setMuted] = useState(savedMuted)
+  const { view, busy, announcement, shownEvents } = usePresentation(
+    realView,
+    events,
+    names,
+    (e) => {
+      if (!muted) playSound(e, realView.seat)
+    },
+  )
   const me = view.seat
   const rival = nextSeat(view, me)
   // While a move is still being shown nothing can be played.
@@ -56,6 +68,19 @@ export function Table({ view: realView, names, events, onAction, rivalStatus, ov
     <section className="game" aria-label="Mesa">
       <header className="scorebar" aria-label="Puntos">
         {score(me, 'score-me')}
+        <button
+          type="button"
+          className="sound-toggle"
+          aria-pressed={!muted}
+          aria-label="Sonido"
+          title={muted ? 'Activar sonido' : 'Silenciar'}
+          onClick={() => {
+            setMuted(!muted)
+            saveMuted(!muted)
+          }}
+        >
+          {muted ? <VolumeX aria-hidden="true" /> : <Volume2 aria-hidden="true" />}
+        </button>
         <p className="round-info">
           <b>Ronda {view.roundNumber}</b>A {view.config.target},{' '}
           {view.config.flor ? 'con flor' : 'sin flor'}

@@ -426,6 +426,7 @@ button.card:disabled {
 }
 
 .scorebar {
+  position: relative;
   display: grid;
   grid-template-columns: 1fr auto 1fr;
   align-items: center;
@@ -458,6 +459,31 @@ button.card:disabled {
 .score-name small {
   font-weight: 400;
   color: var(--muted);
+}
+
+.sound-toggle {
+  position: absolute;
+  left: var(--gutter);
+  top: calc(100% + 12px);
+  width: 44px;
+  height: 44px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  border: var(--border) solid var(--ink);
+  background: var(--card);
+  color: var(--ink);
+  cursor: pointer;
+  z-index: 3;
+}
+
+.sound-toggle[aria-pressed='false'] {
+  color: var(--muted);
+}
+
+.sound-toggle svg {
+  width: 20px;
+  height: 20px;
 }
 
 .round-info {
