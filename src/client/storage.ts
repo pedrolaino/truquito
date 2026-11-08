@@ -1,0 +1,30 @@
+import { cleanName, isId } from '../shared/protocol.ts'
+
+// Everything read back from localStorage is validated: it can be edited by hand.
+function read(key: string): string | null {
+  try {
+    return localStorage.getItem(key)
+  } catch {
+    return null
+  }
+}
+
+function write(key: string, value: string | null) {
+  try {
+    if (value === null) localStorage.removeItem(key)
+    else localStorage.setItem(key, value)
+  } catch {
+    // Private mode or full storage: the app still works, it just forgets.
+  }
+}
+
+export const savedName = () => cleanName(read('truquito:name')) ?? ''
+export const saveName = (name: string) => write('truquito:name', name)
+
+export function savedToken(roomId: string): string | null {
+  const token = read(`truquito:room:${roomId}`)
+  return isId(token) ? token : null
+}
+
+export const saveToken = (roomId: string, token: string | null) =>
+  write(`truquito:room:${roomId}`, token)
