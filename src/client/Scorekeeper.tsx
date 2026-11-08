@@ -1,6 +1,8 @@
+import { House, Minus } from 'lucide-react'
 import { useState } from 'react'
-import { type Tally, addPoint, newTally, tallyWinner } from './tally.ts'
+import { Fosforos } from './Fosforos.tsx'
 import { saveTally, savedTally } from './storage.ts'
+import { type Tally, addPoint, newTally, tallyWinner } from './tally.ts'
 import { scoreText } from './text.ts'
 
 const TEAMS = ['Nosotros', 'Ellos'] as const
@@ -15,55 +17,78 @@ export function Scorekeeper({ onExit }: { onExit: () => void }) {
 
   if (!tally)
     return (
-      <main>
-        <h1>Anotador</h1>
-        <p>Para anotar los puntos de un truco con cartas de verdad.</p>
-        <div role="group" aria-label="¿A cuántos?">
-          <button type="button" onClick={() => update(newTally(15))}>
-            A 15
-          </button>
-          <button type="button" onClick={() => update(newTally(30))}>
-            A 30
-          </button>
+      <main className="page">
+        <h1 className="page-title">Anotador</h1>
+        <p className="lead">
+          Para llevar los puntos de un truco con cartas de verdad. Tocás el equipo y suma un
+          fósforo.
+        </p>
+        <div className="panel">
+          <h2>¿A cuántos juegan?</h2>
+          <div className="row" role="group" aria-label="¿A cuántos juegan?">
+            <button type="button" className="btn btn-primary" onClick={() => update(newTally(15))}>
+              A 15
+            </button>
+            <button type="button" className="btn btn-primary" onClick={() => update(newTally(30))}>
+              A 30
+            </button>
+          </div>
         </div>
-        <button type="button" onClick={onExit}>
-          Volver al inicio
+        <button type="button" className="btn btn-quiet" onClick={onExit}>
+          <House aria-hidden="true" /> Volver al inicio
         </button>
       </main>
     )
 
   const winner = tallyWinner(tally)
   return (
-    <main>
-      <h1>Anotador</h1>
-      <p>A {tally.target}. Tocá un equipo para sumarle un punto.</p>
+    <main className="tally">
+      <div className="tally-head">
+        <h1>Anotador</h1>
+        <p>A {tally.target}</p>
+      </div>
       {TEAMS.map((team, i) => (
-        <section key={team} aria-label={team}>
+        <section key={team} aria-label={team} className={winner === i ? 'team winner' : 'team'}>
           <button
             type="button"
+            className="team-add"
             disabled={winner !== null}
             aria-label={`Sumar un punto a ${team}`}
             onClick={() => update(addPoint(tally, i as 0 | 1, 1))}
           >
-            {team}: <span aria-live="polite">{scoreText(tally.points[i]!, tally.target)}</span>
+            <span className="team-name" aria-hidden="true">
+              {team}{' '}
+              <span className="team-points">{scoreText(tally.points[i]!, tally.target)}</span>
+            </span>
+            <Fosforos points={tally.points[i]!} target={tally.target} big />
           </button>
+          <span className="sr-only" aria-live="polite">
+            {team}: {scoreText(tally.points[i]!, tally.target)}
+          </span>
           <button
             type="button"
+            className="btn team-minus"
             disabled={tally.points[i] === 0}
             aria-label={`Restar un punto a ${team}`}
             onClick={() => update(addPoint(tally, i as 0 | 1, -1))}
           >
-            −1
+            <Minus aria-hidden="true" /> 1
           </button>
         </section>
       ))}
-      {winner !== null && <p role="status">¡Ganaron {TEAMS[winner]}!</p>}
-      <button type="button" onClick={() => update(null)}>
-        Nueva partida
-      </button>
-      <button type="button" onClick={onExit}>
-        Volver al inicio
-      </button>
+      <div className="tally-foot row">
+        {winner !== null && (
+          <p role="status" className="alert" style={{ flexBasis: '100%' }}>
+            ¡Ganaron {TEAMS[winner]}!
+          </p>
+        )}
+        <button type="button" className="btn" onClick={() => update(null)}>
+          Nueva partida
+        </button>
+        <button type="button" className="btn btn-quiet" onClick={onExit}>
+          <House aria-hidden="true" /> Inicio
+        </button>
+      </div>
     </main>
   )
 }

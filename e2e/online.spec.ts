@@ -15,6 +15,12 @@ async function twoPlayers(browser: Browser, contextOptions: object) {
   return { ana, beto, a, b, link }
 }
 
+const cardNames = (page: Page) =>
+  page
+    .getByRole('group', { name: 'Tus cartas' })
+    .getByRole('button')
+    .evaluateAll((cards) => cards.map((c) => c.getAttribute('aria-label')))
+
 async function playUntilOver(pages: Page[]) {
   for (let i = 0; i < 600; i++) {
     if (await gameOver(pages[0]!).isVisible()) return
@@ -36,7 +42,8 @@ test('two browsers play a whole online game and a rematch', async ({ browser, co
   await expect(a.getByText('Esperando que Beto acepte la revancha…')).toBeVisible()
   await b.getByRole('button', { name: 'Aceptar la revancha' }).click()
   await expect(gameOver(a)).toBeHidden()
-  await expect(b.getByText(/Puntos.*Vos 0/)).toBeVisible()
+  await expect(gameOver(b)).toBeHidden()
+  await expect(b.getByRole('group', { name: 'Tus cartas' }).getByRole('button')).toHaveCount(3)
   await ana.close()
   await beto.close()
 })
@@ -46,7 +53,7 @@ test('a player who closes the browser gets the seat back', async ({ browser, con
   for (let i = 0; i < 3; i++) await Promise.all([move(a), move(b)])
   await expect(b.getByText(/Te toca|Esperando a Ana/)).toBeVisible()
   await b.waitForTimeout(500)
-  const hand = await b.getByRole('group', { name: 'Tus cartas' }).innerText()
+  const hand = await cardNames(b)
 
   const saved = await beto.storageState()
   await beto.close()
@@ -55,7 +62,7 @@ test('a player who closes the browser gets the seat back', async ({ browser, con
   const back = await browser.newContext({ ...contextOptions, storageState: saved })
   const b2 = await back.newPage()
   await b2.goto(link)
-  await expect(b2.getByRole('group', { name: 'Tus cartas' })).toHaveText(hand)
+  await expect.poll(() => cardNames(b2)).toEqual(hand)
   await expect(a.getByText(/Desconectado/)).toBeHidden()
 
   await playUntilOver([a, b2])
