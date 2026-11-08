@@ -171,6 +171,33 @@ describe('hard bot against people who accept', () => {
   })
 })
 
+describe('going to the mazo', () => {
+  const poor = [c(4, 'oro'), c(5, 'copa'), c(6, 'basto')]
+  const strong = [c(1, 'espada'), c(1, 'basto'), c(7, 'espada')]
+
+  it.each(Object.entries(bots))('%s never leaves before any truco is called', (_, bot) => {
+    const game = createGame({ flor: false, target: 15 }, 1)
+    game.scores = [0, 0]
+    startRound(game, 0, [poor, strong])
+    for (let seed = 1; seed <= 10; seed++)
+      expect(bot(viewFor(game, 0), legalActions(game, 0), seededRandom(seed))).not.toEqual({
+        type: 'mazo',
+      })
+  })
+
+  it.each(Object.entries(bots))('%s keeps playing after the mano opens strong', (_, bot) => {
+    const game = createGame({ flor: false, target: 15 }, 1)
+    game.scores = [0, 0]
+    const mano = [c(7, 'oro'), c(4, 'espada'), c(6, 'copa')]
+    startRound(game, 0, [mano, [c(2, 'copa'), c(12, 'copa'), c(5, 'oro')]])
+    const opened = act(game, 0, { type: 'play', card: c(7, 'oro') })
+    for (let seed = 1; seed <= 10; seed++)
+      expect(bot(viewFor(opened, 1), legalActions(opened, 1), seededRandom(seed))).not.toEqual({
+        type: 'mazo',
+      })
+  })
+})
+
 describe('levels', () => {
   const game = { flor: false, target: 15 } as const
 

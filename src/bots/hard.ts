@@ -104,6 +104,10 @@ function rollout(start: GameState, me: number, random: () => number): number {
  */
 export function createHardBot(samples: number = config.bot.hardSamples): Bot {
   return (view, legal, random) => {
+    // Before any truco, leaving loses the same point as playing on and gives up
+    // the envido, and people find it a dull move, so it is not considered.
+    const { truco } = view.round
+    if (truco.level === 1 && !truco.pending) legal = legal.filter((a) => a.type !== 'mazo')
     if (legal.length === 1) return legal[0]!
     const hands = possibleOpponentHands(view)
     const picked = Array.from(
