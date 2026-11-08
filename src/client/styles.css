@@ -35,8 +35,8 @@
 
 @media (min-width: 900px) {
   :root {
-    --card-w: 108px;
-    --card-table-w: 84px;
+    --card-w: 100px;
+    --card-table-w: 72px;
     --gutter: 24px;
   }
 }
@@ -647,6 +647,22 @@ button.card:disabled {
     max-width: 720px;
     width: 100%;
     margin: 0 auto;
+    gap: 8px;
+  }
+
+  .rival {
+    min-height: 96px;
+  }
+
+  /* One row of calls so the table fits a laptop screen. */
+  .calls {
+    grid-template-columns: none;
+    grid-auto-flow: column;
+    grid-auto-columns: minmax(0, 1fr);
+  }
+
+  .calls .btn-quiet {
+    grid-column: auto;
   }
 
   .log {
