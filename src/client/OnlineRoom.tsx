@@ -1,4 +1,5 @@
 import { type FormEvent, type ReactNode, useEffect, useState } from 'react'
+import { Check, Copy, Hourglass, House, Share2, Swords, WifiOff } from 'lucide-react'
 import { nextSeat } from '../engine/game.ts'
 import type { RoomSnapshot } from '../shared/protocol.ts'
 import { cleanName } from '../shared/protocol.ts'
@@ -15,26 +16,37 @@ interface Props {
 export function OnlineRoom({ roomId, navigate }: Props) {
   const room = useRoom(roomId)
   const home = (
-    <button type="button" onClick={() => navigate('/')}>
-      Volver al inicio
+    <button type="button" className="btn btn-quiet" onClick={() => navigate('/')}>
+      <House aria-hidden="true" /> Volver al inicio
     </button>
   )
 
   if (!room.token) {
     const { lobby } = room
     return (
-      <main>
-        <h1>Truquito</h1>
-        {lobby.kind === 'loading' && <p>Cargando la sala…</p>}
-        {lobby.kind === 'missing' && <p role="alert">Esta sala no existe o ya cerró.</p>}
-        {lobby.kind === 'full' && <p role="alert">La sala está llena: ya hay dos jugadores.</p>}
+      <main className="page">
+        <h1 className="page-title">Truquito</h1>
+        {lobby.kind === 'loading' && <p role="status">Cargando la sala…</p>}
+        {lobby.kind === 'missing' && (
+          <p role="alert" className="alert">
+            Esta sala no existe o ya cerró.
+          </p>
+        )}
+        {lobby.kind === 'full' && (
+          <p role="alert" className="alert">
+            La sala está llena: ya hay dos jugadores.
+          </p>
+        )}
         {lobby.kind === 'error' && (
-          <p role="alert">No pudimos conectarnos. Probá recargar la página.</p>
+          <p role="alert" className="alert">
+            No pudimos conectarnos. Probá recargar la página.
+          </p>
         )}
         {lobby.kind === 'join' && (
           <JoinForm
             host={lobby.info.players[0]?.name ?? ''}
-            rules={`${lobby.info.config.flor ? 'Con flor' : 'Sin flor'}, a ${lobby.info.config.target}`}
+            flor={lobby.info.config.flor}
+            target={lobby.info.config.target}
             onJoin={room.join}
           />
         )}
@@ -46,32 +58,37 @@ export function OnlineRoom({ roomId, navigate }: Props) {
   const { snapshot } = room
   if (!snapshot)
     return (
-      <main>
-        <h1>Truquito</h1>
-        <p>Conectando…</p>
+      <main className="page">
+        <h1 className="page-title">Truquito</h1>
+        <p role="status">Conectando…</p>
       </main>
     )
 
   return (
-    <main>
-      <h1>Truquito</h1>
-      {!room.online && <p role="status">Se cortó la conexión. Reconectando…</p>}
+    <>
+      {!room.online && (
+        <p role="status" className="alert" style={{ margin: '8px 16px 0' }}>
+          Se cortó la conexión. Reconectando…
+        </p>
+      )}
       {snapshot.game ? (
         <Game snapshot={snapshot} room={room} home={home} />
       ) : (
-        <Waiting roomId={roomId} />
+        <Waiting roomId={roomId} snapshot={snapshot} />
       )}
-    </main>
+    </>
   )
 }
 
 function JoinForm({
   host,
-  rules,
+  flor,
+  target,
   onJoin,
 }: {
   host: string
-  rules: string
+  flor: boolean
+  target: number
   onJoin: (name: string) => Promise<void>
 }) {
   const [name, setName] = useState(savedName)
@@ -89,12 +106,16 @@ function JoinForm({
   }
 
   return (
-    <form onSubmit={submit}>
+    <form onSubmit={submit} className="panel">
+      <h2>
+        <Swords aria-hidden="true" /> {host} te invita a un truco
+      </h2>
       <p>
-        {host} te invita a jugar al truco. {rules}.
+        <span className="tag">{flor ? 'con flor' : 'sin flor'}</span>{' '}
+        <span className="tag">a {target}</span>
       </p>
-      <label>
-        Tu nombre{' '}
+      <label className="field">
+        Tu nombre
         <input
           value={name}
           maxLength={20}
@@ -102,53 +123,72 @@ function JoinForm({
           onChange={(e) => setName(e.target.value)}
         />
       </label>
-      <button type="submit" disabled={busy}>
+      <button type="submit" className="btn btn-primary" disabled={busy}>
         Entrar
       </button>
-      {error && <p role="alert">{error}</p>}
+      {error && (
+        <p role="alert" className="alert">
+          {error}
+        </p>
+      )}
     </form>
   )
 }
 
-function Waiting({ roomId }: { roomId: string }) {
+function Waiting({ roomId, snapshot }: { roomId: string; snapshot: RoomSnapshot }) {
   const url = `${location.origin}/r/${roomId}`
   const [copied, setCopied] = useState(false)
   const canShare = typeof navigator.share === 'function'
   return (
-    <section aria-label="Sala de espera">
-      <h2>Esperando a tu rival</h2>
-      <p>Mandale este link para que entre:</p>
-      <p>
+    <main className="page">
+      <h1 className="page-title">Truquito</h1>
+      <section className="panel" aria-labelledby="waiting">
+        <h2 id="waiting">
+          <Hourglass aria-hidden="true" /> Esperando a tu rival
+        </h2>
+        <p>Mandale este link. Apenas entre, arranca la partida.</p>
         <input
+          className="link-box"
           readOnly
           value={url}
           aria-label="Link de la sala"
           onFocus={(e) => e.target.select()}
         />
+        <div className="row">
+          {canShare && (
+            <button
+              type="button"
+              className="btn btn-primary"
+              onClick={() =>
+                navigator.share({ title: 'Truquito', text: '¿Un truco?', url }).catch(() => {})
+              }
+            >
+              <Share2 aria-hidden="true" /> Compartir
+            </button>
+          )}
+          <button
+            type="button"
+            className={canShare ? 'btn' : 'btn btn-primary'}
+            onClick={() =>
+              navigator.clipboard?.writeText(url).then(
+                () => setCopied(true),
+                () => setCopied(false),
+              )
+            }
+          >
+            {copied ? <Check aria-hidden="true" /> : <Copy aria-hidden="true" />}{' '}
+            {copied ? 'Link copiado' : 'Copiar link'}
+          </button>
+        </div>
+        <p>
+          <span className="tag">{snapshot.config.flor ? 'con flor' : 'sin flor'}</span>{' '}
+          <span className="tag">a {snapshot.config.target}</span>
+        </p>
+      </section>
+      <p role="status" className="sr-only">
+        {copied ? 'Link copiado.' : ''}
       </p>
-      <button
-        type="button"
-        onClick={() =>
-          navigator.clipboard?.writeText(url).then(
-            () => setCopied(true),
-            () => setCopied(false),
-          )
-        }
-      >
-        Copiar link
-      </button>
-      {canShare && (
-        <button
-          type="button"
-          onClick={() =>
-            navigator.share({ title: 'Truquito', text: '¿Un truco?', url }).catch(() => {})
-          }
-        >
-          Compartir
-        </button>
-      )}
-      <p role="status">{copied ? 'Link copiado.' : ''}</p>
-    </section>
+    </main>
   )
 }
 
@@ -188,20 +228,25 @@ function Game({
         events={room.events}
         onAction={room.act}
         rivalStatus={
-          rivalOffline && winner === null ? (
-            <span role="status">
-              Desconectado, esperando que vuelva{seconds !== null ? ` (${seconds} s)` : ''}.
+          rivalOffline &&
+          winner === null && (
+            <span className="offline" role="status">
+              <WifiOff aria-hidden="true" /> Desconectado, esperando que vuelva
+              {seconds !== null ? ` (${seconds} s)` : ''}
             </span>
-          ) : null
+          )
         }
       />
       {winner !== null && (
         <GameOver
           won={winner === me}
+          names={['Vos', names[rival]!]}
+          scores={[game.scores[me]!, game.scores[rival]!]}
+          target={game.config.target}
           detail={
             snapshot.abandonedBy !== null
               ? winner === me
-                ? 'Tu rival abandonó.'
+                ? 'Tu rival no volvió.'
                 : 'Perdiste por abandono.'
               : undefined
           }
@@ -209,7 +254,7 @@ function Game({
           {snapshot.rematch[me] ? (
             <p role="status">Esperando que {names[rival]} acepte la revancha…</p>
           ) : (
-            <button type="button" onClick={room.rematch}>
+            <button type="button" className="btn btn-primary" onClick={room.rematch}>
               {snapshot.rematch[rival] ? 'Aceptar la revancha' : 'Pedir revancha'}
             </button>
           )}

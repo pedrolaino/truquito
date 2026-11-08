@@ -1,8 +1,9 @@
 import { useEffect, useState, useSyncExternalStore } from 'react'
+import { RotateCcw, House } from 'lucide-react'
 import type { Level } from '../bots/index.ts'
 import { seededRandom } from '../bots/match.ts'
 import { type GameConfig, viewFor } from '../engine/game.ts'
-import { BotGame, HUMAN } from './botGame.ts'
+import { BOT, BotGame, HUMAN } from './botGame.ts'
 import { decideInWorker } from './decide.ts'
 import { GameOver } from './GameOver.tsx'
 import { Table } from './Table.tsx'
@@ -16,17 +17,11 @@ const randomSeed = () => crypto.getRandomValues(new Uint32Array(1))[0]!
 
 function newGame(level: Level, config: GameConfig) {
   const seed = randomSeed()
-  return new BotGame(
-    level,
-    config,
-    seed,
-    decideInWorker,
-    (fn, ms) => {
-      const id = setTimeout(fn, ms)
-      return () => clearTimeout(id)
-    },
-    seededRandom(seed ^ 0x5bd1e995),
-  )
+  const schedule = (fn: () => void, ms: number) => {
+    const id = setTimeout(fn, ms)
+    return () => clearTimeout(id)
+  }
+  return new BotGame(level, config, seed, decideInWorker, schedule, seededRandom(seed ^ 0x5bd1e995))
 }
 
 export function BotMatch({
@@ -43,31 +38,40 @@ export function BotMatch({
   const { state, events, failed } = useSyncExternalStore(game.subscribe, game.getSnapshot)
   if (failed) throw new Error('The bot stopped working')
 
-  const names = ['Vos', LEVELS[level]]
   return (
-    <main>
-      <h1>Truquito</h1>
+    <>
       <Table
         view={viewFor(state, HUMAN)}
-        names={names}
+        names={['Vos', LEVELS[level]]}
         events={events}
         onAction={(a) => game.play(a)}
+        rivalStatus={
+          state.winner === null && (
+            <button type="button" className="btn btn-quiet" onClick={onExit}>
+              Salir
+            </button>
+          )
+        }
       />
       {state.winner !== null && (
-        <GameOver won={state.winner === HUMAN}>
-          <button type="button" onClick={() => setGame(newGame(level, config))}>
-            Jugar de nuevo
+        <GameOver
+          won={state.winner === HUMAN}
+          names={['Vos', LEVELS[level]]}
+          scores={[state.scores[HUMAN]!, state.scores[BOT]!]}
+          target={config.target}
+        >
+          <button
+            type="button"
+            className="btn btn-primary"
+            onClick={() => setGame(newGame(level, config))}
+          >
+            <RotateCcw aria-hidden="true" /> Jugar de nuevo
           </button>
-          <button type="button" onClick={onExit}>
-            Volver al inicio
+          <button type="button" className="btn" onClick={onExit}>
+            <House aria-hidden="true" /> Volver al inicio
           </button>
         </GameOver>
       )}
-      {state.winner === null && (
-        <button type="button" onClick={onExit}>
-          Salir
-        </button>
-      )}
-    </main>
+    </>
   )
 }

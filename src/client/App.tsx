@@ -26,10 +26,14 @@ export function App() {
   if (path === '/anotador') return <Scorekeeper onExit={() => navigate('/')} />
   if (path !== '/')
     return (
-      <main>
-        <h1>Truquito</h1>
-        <p role="alert">Esta página no existe.</p>
-        <a href="/">Volver al inicio</a>
+      <main className="page">
+        <h1 className="page-title">Truquito</h1>
+        <p role="alert" className="alert">
+          Esta página no existe.
+        </p>
+        <a className="btn" href="/">
+          Volver al inicio
+        </a>
       </main>
     )
   if (bot) return <BotMatch {...bot} onExit={() => setBot(null)} />

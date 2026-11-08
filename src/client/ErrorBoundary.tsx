@@ -10,10 +10,14 @@ export class ErrorBoundary extends Component<{ children: ReactNode }, { failed: 
   render() {
     if (!this.state.failed) return this.props.children
     return (
-      <main>
-        <h1>Truquito</h1>
-        <p role="alert">Algo salió mal.</p>
-        <a href="/">Volver al inicio</a>
+      <main className="page">
+        <h1 className="page-title">Truquito</h1>
+        <p role="alert" className="alert">
+          Algo salió mal y la partida se cortó. Volvé al inicio para empezar otra.
+        </p>
+        <a className="btn btn-primary" href="/">
+          Volver al inicio
+        </a>
       </main>
     )
   }

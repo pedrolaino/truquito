@@ -19,5 +19,5 @@ test('plays a whole game against the bot', async ({ page }) => {
 
   await page.getByRole('button', { name: 'Jugar de nuevo' }).click()
   await expect(gameOver(page)).toBeHidden()
-  await expect(page.getByRole('list', { name: 'Bazas' })).toHaveText(/^Baza 1/)
+  await expect(page.getByRole('group', { name: 'Tus cartas' }).getByRole('button')).toHaveCount(3)
 })

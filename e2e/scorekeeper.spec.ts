@@ -11,11 +11,11 @@ test('keeps the score of a real game and survives a reload', async ({ page }) =>
   await ellos.click()
   await ellos.click()
   await page.getByRole('button', { name: 'Restar un punto a Ellos' }).click()
-  await expect(nosotros).toHaveText('Nosotros: 2 buenas')
-  await expect(ellos).toHaveText('Ellos: 1 mala')
+  await expect(nosotros).toContainText('2 buenas')
+  await expect(ellos).toContainText('1 mala')
 
   await page.reload()
-  await expect(nosotros).toHaveText('Nosotros: 2 buenas')
+  await expect(nosotros).toContainText('2 buenas')
 
   for (let i = 0; i < 13; i++) await nosotros.click()
   await expect(page.getByRole('status')).toHaveText('¡Ganaron Nosotros!')
