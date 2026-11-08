@@ -598,6 +598,7 @@ button.card:disabled {
   font-size: 24px;
   line-height: 1.2;
   text-align: center;
+  white-space: pre-line;
   z-index: 2;
   animation: pop 220ms var(--ease-out) both;
 }

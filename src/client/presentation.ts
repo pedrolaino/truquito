@@ -20,7 +20,7 @@ export function eventDuration(event: GameEvent, me: number): number {
     case 'trick':
       return pace.trick
     case 'score':
-      return pace.score
+      return event.reason === 'round' ? pace.play.mine : pace.score
     case 'roundEnd':
       return pace.roundEnd
     case 'deal':
@@ -103,6 +103,8 @@ export interface Announcement {
   seat: number | null
 }
 
+const REASONS = { envido: 'el envido', flor: 'la flor', round: 'la ronda' } as const
+
 const SPOKEN = {
   envido: '¡Envido!',
   realEnvido: '¡Real envido!',
@@ -139,29 +141,25 @@ export function announce(
     case 'play':
       return event.seat === me ? null : said(cardName(event.card))
     case 'trick':
-      if (event.winner === 'parda') return { text: 'Parda', seat: null }
-      return {
-        text: event.winner === me ? 'Ganaste la baza' : `Baza para ${who(event.winner)}`,
-        seat: null,
-      }
+      // The cards on the table already show it.
+      return null
     case 'score': {
-      const reason = { envido: 'el envido', flor: 'la flor', round: 'la ronda' }[event.reason]
+      // Round points are summed up with the round.
+      if (event.reason === 'round') return null
       const plural = event.points === 1 ? 'punto' : 'puntos'
-      return {
-        text: `${event.seat === me ? 'Sumás' : `${who(event.seat)} suma`} ${event.points} ${plural} por ${reason}`,
-        seat: null,
-      }
+      const who = event.seat === me ? 'Sumás' : `${names[event.seat]} suma`
+      return { text: `${who} ${event.points} ${plural} por ${REASONS[event.reason]}`, seat: null }
     }
     case 'roundEnd': {
-      const points = [...before].reverse().find((e) => e.type === 'score' && e.reason === 'round')
-      const extra = points && points.type === 'score' ? ` (+${points.points})` : ''
-      return {
-        text:
-          event.winner === me
-            ? `Ganaste la ronda${extra}`
-            : `Ronda para ${who(event.winner)}${extra}`,
-        seat: null,
-      }
+      const lastDeal = before.findLastIndex((e) => e.type === 'deal')
+      const points = before
+        .slice(lastDeal + 1)
+        .filter((e) => e.type === 'score')
+        .map(
+          (e) => `${e.seat === me ? 'Vos' : names[e.seat]} +${e.points} por ${REASONS[e.reason]}`,
+        )
+      const title = event.winner === me ? 'Ganaste la ronda' : `Ronda para ${names[event.winner]}`
+      return { text: [title, ...points].join('\n'), seat: null }
     }
     case 'deal':
       return {

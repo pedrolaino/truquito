@@ -8,7 +8,7 @@ import {
   startRound,
   viewFor,
 } from '../engine/game.ts'
-import { stepView } from './presentation.ts'
+import { announce, stepView } from './presentation.ts'
 
 const c = (rank: Card['rank'], suit: Card['suit']): Card => ({ rank, suit })
 const a = [c(1, 'espada'), c(7, 'espada'), c(4, 'oro')]
@@ -72,5 +72,34 @@ describe('stepping the view through events', () => {
     expect(views[firstDeal]!.round.mano).toBe(1)
     expect(views[firstDeal]!.round.tricks).toEqual([{ lead: 1, cards: [null, null], winner: null }])
     expect(views.at(-1)!.roundNumber).toBe(3)
+  })
+})
+
+describe('announcements', () => {
+  const names = ['Pedro', 'Bot medio']
+  const banners = (events: GameEvent[]) =>
+    events.map((e, i) => announce(e, names, 0, events.slice(0, i))).filter((a) => a !== null)
+
+  it('marks tricks without a banner', () => {
+    expect(announce({ type: 'trick', winner: 1 }, names, 0, [])).toBeNull()
+    expect(announce({ type: 'trick', winner: 'parda' }, names, 0, [])).toBeNull()
+  })
+
+  it('sums up every point of the round in one banner', () => {
+    // Bot calls truco, Pedro answers envido, the bot declines it and Pedro declines the truco.
+    const start = setup()
+    startRound(start, 1, [a, b])
+    const { events } = run(start, [
+      [1, { type: 'truco' }],
+      [0, { type: 'envido', call: 'envido' }],
+      [1, { type: 'noQuiero' }],
+      [0, { type: 'noQuiero' }],
+    ])
+    const shown = banners(events.slice(0, events.findIndex((e) => e.type === 'roundEnd') + 1))
+    const centre = shown.filter((b) => b.seat === null).map((b) => b.text)
+    expect(centre).toEqual([
+      'Sumás 1 punto por el envido',
+      'Ronda para Bot medio\nVos +1 por el envido\nBot medio +1 por la ronda',
+    ])
   })
 })
