@@ -548,15 +548,51 @@ button.card:disabled {
   flex: 1;
 }
 
-.tricks.previous .trick {
-  opacity: 0.55;
+.table-center {
+  position: relative;
+  flex: 1;
+  display: grid;
+  align-content: center;
 }
 
-.tricks-caption {
-  grid-column: 1 / -1;
-  font-size: 14px;
-  color: var(--muted);
+.banner {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  translate: -50% -50%;
+  width: max-content;
+  max-width: 100%;
+  padding: 12px 20px;
+  border-radius: var(--radius);
+  border: var(--border) solid var(--ink);
+  background: var(--card);
+  box-shadow: 5px 5px 0 var(--ink);
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 24px;
+  line-height: 1.2;
   text-align: center;
+  z-index: 2;
+  animation: pop 220ms var(--ease-out) both;
+}
+
+.bubble-me {
+  position: static;
+  align-self: center;
+  max-width: 80%;
+  border-radius: 16px 16px 16px 4px;
+  background: var(--accent);
+  color: var(--accent-ink);
+  text-align: center;
+}
+
+.slot.won .card {
+  outline: 3px solid var(--accent);
+  outline-offset: 3px;
+}
+
+.slot.lost .card {
+  opacity: 0.45;
 }
 
 .trick {

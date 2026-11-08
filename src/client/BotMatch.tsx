@@ -41,10 +41,32 @@ export function BotMatch({
   return (
     <>
       <Table
+        key={game.id}
         view={viewFor(state, HUMAN)}
         names={['Vos', LEVELS[level]]}
         events={events}
         onAction={(a) => game.play(a)}
+        over={
+          state.winner !== null && (
+            <GameOver
+              won={state.winner === HUMAN}
+              names={['Vos', LEVELS[level]]}
+              scores={[state.scores[HUMAN]!, state.scores[BOT]!]}
+              target={config.target}
+            >
+              <button
+                type="button"
+                className="btn btn-primary"
+                onClick={() => setGame(newGame(level, config))}
+              >
+                <RotateCcw aria-hidden="true" /> Jugar de nuevo
+              </button>
+              <button type="button" className="btn" onClick={onExit}>
+                <House aria-hidden="true" /> Volver al inicio
+              </button>
+            </GameOver>
+          )
+        }
         rivalStatus={
           state.winner === null && (
             <button type="button" className="btn btn-quiet" onClick={onExit}>
@@ -53,25 +75,6 @@ export function BotMatch({
           )
         }
       />
-      {state.winner !== null && (
-        <GameOver
-          won={state.winner === HUMAN}
-          names={['Vos', LEVELS[level]]}
-          scores={[state.scores[HUMAN]!, state.scores[BOT]!]}
-          target={config.target}
-        >
-          <button
-            type="button"
-            className="btn btn-primary"
-            onClick={() => setGame(newGame(level, config))}
-          >
-            <RotateCcw aria-hidden="true" /> Jugar de nuevo
-          </button>
-          <button type="button" className="btn" onClick={onExit}>
-            <House aria-hidden="true" /> Volver al inicio
-          </button>
-        </GameOver>
-      )}
     </>
   )
 }

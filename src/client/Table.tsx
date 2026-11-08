@@ -4,7 +4,6 @@ import {
   type Action,
   type GameEvent,
   type GameView,
-  type RoundView,
   actorOf,
   handOf,
   legalActions,
@@ -12,7 +11,8 @@ import {
 } from '../engine/game.ts'
 import { CardBack, CardButton, CardView } from './Card.tsx'
 import { Fosforos } from './Fosforos.tsx'
-import { actionLabel, eventText, scoreText, spokenText } from './text.ts'
+import { actionLabel, eventText, scoreText } from './text.ts'
+import { usePresentation } from './usePresentation.ts'
 
 interface Props {
   view: GameView
@@ -22,14 +22,18 @@ interface Props {
   onAction: (action: Action) => void
   /** Shown next to the rival's name, e.g. when they are disconnected. */
   rivalStatus?: ReactNode
+  /** Game over panel, shown once the last move has played out. */
+  over?: ReactNode
 }
 
 const tilt = (deg: number) => ({ '--tilt': `${deg}deg` }) as CSSProperties
 
-export function Table({ view, names, events, onAction, rivalStatus }: Props) {
+export function Table({ view: realView, names, events, onAction, rivalStatus, over }: Props) {
+  const { view, busy, announcement, shownEvents } = usePresentation(realView, events, names)
   const me = view.seat
   const rival = nextSeat(view, me)
-  const legal = legalActions(view, me)
+  // While a move is still being shown nothing can be played.
+  const legal = busy ? [] : legalActions(view, me)
   const actor = actorOf(view)
   const round = view.round
   const hand = handOf(round, me)
@@ -37,12 +41,7 @@ export function Table({ view, names, events, onAction, rivalStatus }: Props) {
   const calls = legal.filter((a) => a.type !== 'play')
   const canPlay = (card: (typeof hand)[number]) =>
     legal.some((a) => a.type === 'play' && sameCard(a.card, card))
-
-  // Until the first card of a new round, keep the last round on the table.
-  const fresh = round.tricks.length === 1 && round.tricks[0]!.cards.every((c) => c === null)
-  const shown: RoundView = fresh && view.previous ? view.previous : round
-  const lines = events.map((e) => eventText(e, names)).filter((t): t is string => t !== null)
-  const bubble = rivalSpeech(events, rival)
+  const lines = shownEvents.map((e) => eventText(e, names)).filter((t): t is string => t !== null)
 
   const score = (seat: number, side: string) => (
     <div className={`score ${side}`}>
@@ -75,46 +74,68 @@ export function Table({ view, names, events, onAction, rivalStatus }: Props) {
             {names[rival]} {round.mano === rival && <span className="tag">mano</span>}
             {rivalStatus}
           </p>
-          {bubble && (
-            <p className="bubble" key={events.length} aria-hidden="true">
-              {bubble}
+          {announcement?.seat === rival && (
+            <p className="bubble" key={shownEvents.length} aria-hidden="true">
+              {announcement.text}
             </p>
           )}
         </div>
 
-        <ol className={shown === round ? 'tricks' : 'tricks previous'} aria-label="Bazas">
-          {shown !== round && (
-            <li className="tricks-caption">Ronda anterior: {roundResult(shown, names)}</li>
+        <div className="table-center">
+          <ol className="tricks" aria-label="Bazas">
+            {[0, 1, 2].map((i) => {
+              const trick = round.tricks[i]
+              const outcome = (seat: number) =>
+                !trick || trick.winner === null || trick.winner === 'parda'
+                  ? ''
+                  : trick.winner === seat
+                    ? ' won'
+                    : ' lost'
+              const rivalCard = trick?.cards[rival]
+              const myCard = trick?.cards[me]
+              return (
+                <li key={`${view.roundNumber}-${i}`} className="trick" aria-label={`Baza ${i + 1}`}>
+                  <div className={`slot from-rival${outcome(rival)}`}>
+                    {rivalCard && <CardView card={rivalCard} />}
+                  </div>
+                  <div className={`slot from-me${outcome(me)}`}>
+                    {myCard && <CardView card={myCard} />}
+                  </div>
+                  <span className={trick?.winner === me ? 'trick-result won' : 'trick-result'}>
+                    {trick?.winner === null || trick?.winner === undefined
+                      ? ''
+                      : trick.winner === 'parda'
+                        ? 'Parda'
+                        : trick.winner === me
+                          ? 'Ganaste'
+                          : `Ganó ${names[rival]}`}
+                  </span>
+                </li>
+              )
+            })}
+          </ol>
+          {announcement && announcement.seat === null && (
+            <p className="banner" key={shownEvents.length} aria-hidden="true">
+              {announcement.text}
+            </p>
           )}
-          {[0, 1, 2].map((i) => {
-            const trick = shown.tricks[i]
-            const rivalCard = trick?.cards[rival]
-            const myCard = trick?.cards[me]
-            return (
-              <li key={`${view.roundNumber}-${i}`} className="trick" aria-label={`Baza ${i + 1}`}>
-                <div className="slot from-rival">{rivalCard && <CardView card={rivalCard} />}</div>
-                <div className="slot from-me">{myCard && <CardView card={myCard} />}</div>
-                <span className={trick?.winner === me ? 'trick-result won' : 'trick-result'}>
-                  {trick?.winner === null || trick?.winner === undefined
-                    ? ''
-                    : trick.winner === 'parda'
-                      ? 'Parda'
-                      : trick.winner === me
-                        ? 'Ganaste'
-                        : `Ganó ${names[rival]}`}
-                </span>
-              </li>
-            )
-          })}
-        </ol>
+        </div>
 
-        <p className="turn" role="status">
-          {actor === null
-            ? 'Partida terminada'
-            : actor === me
-              ? 'Te toca'
-              : `Esperando a ${names[actor]}…`}
-        </p>
+        {announcement?.seat === me ? (
+          <p className="bubble bubble-me" key={shownEvents.length} aria-hidden="true">
+            {announcement.text}
+          </p>
+        ) : (
+          <p className="turn">
+            {busy
+              ? ''
+              : actor === null
+                ? 'Partida terminada'
+                : actor === me
+                  ? 'Te toca'
+                  : `Esperando a ${names[actor]}…`}
+          </p>
+        )}
 
         <div
           role="group"
@@ -158,26 +179,11 @@ export function Table({ view, names, events, onAction, rivalStatus }: Props) {
           <p key={lines.length - 14 + i}>{line}</p>
         ))}
       </aside>
+      {!busy && over}
       <div className="sr-only" aria-live="polite">
-        {lines.slice(-3).map((line, i) => (
-          <p key={lines.length - 3 + i}>{line}</p>
-        ))}
+        {announcement && <p key={shownEvents.length}>{announcement.text}</p>}
+        {!busy && actor === me && <p>Te toca</p>}
       </div>
     </section>
   )
-}
-
-/** What the rival just said out loud, if it is the latest thing that happened. */
-function rivalSpeech(events: GameEvent[], rival: number): string | null {
-  for (let i = events.length - 1; i >= Math.max(0, events.length - 3); i--) {
-    const e = events[i]!
-    if (e.type === 'score' || e.type === 'roundEnd' || e.type === 'deal' || e.type === 'trick')
-      continue
-    return 'seat' in e && e.seat === rival ? spokenText(e) : null
-  }
-  return null
-}
-
-function roundResult(round: RoundView, names: string[]): string {
-  return round.winner === null ? 'sin terminar' : `ganó ${names[round.winner]}`
 }

@@ -82,7 +82,7 @@ export function useRoom(roomId: string) {
         lastSeq.current = state.seq
         setOnline(true)
         setSnapshot(state)
-        if (state.events.length > 0) setEvents((list) => [...list, ...state.events].slice(-100))
+        if (state.events.length > 0) setEvents((list) => [...list, ...state.events])
       }
       ws.onclose = () => {
         setOnline(false)

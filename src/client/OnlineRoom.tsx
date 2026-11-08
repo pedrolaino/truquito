@@ -227,6 +227,32 @@ function Game({
         names={names}
         events={room.events}
         onAction={room.act}
+        over={
+          winner !== null && (
+            <GameOver
+              won={winner === me}
+              names={['Vos', names[rival]!]}
+              scores={[game.scores[me]!, game.scores[rival]!]}
+              target={game.config.target}
+              detail={
+                snapshot.abandonedBy !== null
+                  ? winner === me
+                    ? 'Tu rival no volvió.'
+                    : 'Perdiste por abandono.'
+                  : undefined
+              }
+            >
+              {snapshot.rematch[me] ? (
+                <p role="status">Esperando que {names[rival]} acepte la revancha…</p>
+              ) : (
+                <button type="button" className="btn btn-primary" onClick={room.rematch}>
+                  {snapshot.rematch[rival] ? 'Aceptar la revancha' : 'Pedir revancha'}
+                </button>
+              )}
+              {home}
+            </GameOver>
+          )
+        }
         rivalStatus={
           rivalOffline &&
           winner === null && (
@@ -237,30 +263,6 @@ function Game({
           )
         }
       />
-      {winner !== null && (
-        <GameOver
-          won={winner === me}
-          names={['Vos', names[rival]!]}
-          scores={[game.scores[me]!, game.scores[rival]!]}
-          target={game.config.target}
-          detail={
-            snapshot.abandonedBy !== null
-              ? winner === me
-                ? 'Tu rival no volvió.'
-                : 'Perdiste por abandono.'
-              : undefined
-          }
-        >
-          {snapshot.rematch[me] ? (
-            <p role="status">Esperando que {names[rival]} acepte la revancha…</p>
-          ) : (
-            <button type="button" className="btn btn-primary" onClick={room.rematch}>
-              {snapshot.rematch[rival] ? 'Aceptar la revancha' : 'Pedir revancha'}
-            </button>
-          )}
-          {home}
-        </GameOver>
-      )}
     </>
   )
 }

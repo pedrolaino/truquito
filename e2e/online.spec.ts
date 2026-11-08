@@ -8,6 +8,9 @@ async function twoPlayers(browser: Browser, contextOptions: object) {
   const beto = await browser.newContext(contextOptions)
   const a = await ana.newPage()
   const b = await beto.newPage()
+  // Moves play out with pauses; the fake clock skips them.
+  await a.clock.install()
+  await b.clock.install()
   const link = await createRoom(a, 'Ana')
   expect(link).toMatch(/\/r\/[0-9a-f]{32}$/)
   await joinRoom(b, link, 'Beto')
@@ -27,6 +30,7 @@ async function playUntilOver(pages: Page[]) {
     for (const page of pages) await move(page)
     // Roughly human pace, well under the per-connection message limit.
     await pages[0]!.waitForTimeout(100)
+    for (const page of pages) await page.clock.fastForward(2500)
   }
 }
 
@@ -50,7 +54,10 @@ test('two browsers play a whole online game and a rematch', async ({ browser, co
 
 test('a player who closes the browser gets the seat back', async ({ browser, contextOptions }) => {
   const { ana, beto, a, b, link } = await twoPlayers(browser, contextOptions)
-  for (let i = 0; i < 3; i++) await Promise.all([move(a), move(b)])
+  for (let i = 0; i < 3; i++) {
+    await Promise.all([move(a), move(b)])
+    await Promise.all([a.clock.fastForward(2500), b.clock.fastForward(2500)])
+  }
   await expect(b.getByText(/Te toca|Esperando a Ana/)).toBeVisible()
   await b.waitForTimeout(500)
   const hand = await cardNames(b)
@@ -61,6 +68,7 @@ test('a player who closes the browser gets the seat back', async ({ browser, con
 
   const back = await browser.newContext({ ...contextOptions, storageState: saved })
   const b2 = await back.newPage()
+  await b2.clock.install()
   await b2.goto(link)
   await expect.poll(() => cardNames(b2)).toEqual(hand)
   await expect(a.getByText(/Desconectado/)).toBeHidden()

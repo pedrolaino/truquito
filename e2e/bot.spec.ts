@@ -12,10 +12,10 @@ test('plays a whole game against the bot', async ({ page }) => {
 
   for (let i = 0; i < 300 && !(await gameOver(page).isVisible()); i++) {
     await move(page)
-    await page.clock.fastForward(1500)
+    await page.clock.fastForward(2500)
   }
   await expect(gameOver(page)).toBeVisible()
-  await expect(page.getByText(/Partida para/).last()).toBeVisible()
+  await expect(page.locator('.final-score')).toContainText('15')
 
   await page.getByRole('button', { name: 'Jugar de nuevo' }).click()
   await expect(gameOver(page)).toBeHidden()

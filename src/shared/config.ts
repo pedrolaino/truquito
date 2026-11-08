@@ -9,6 +9,18 @@ export const config = {
     /** Opponent hands the hard bot samples per decision. */
     hardSamples: 40,
   },
+  /**
+   * How long each thing that happens stays on screen before the next one, in
+   * ms. Moves by the other player get more time than your own.
+   */
+  pace: {
+    play: { mine: 250, theirs: 650 },
+    speech: { mine: 700, theirs: 1300 },
+    trick: 1000,
+    score: 900,
+    roundEnd: 1900,
+    deal: 700,
+  },
   room: {
     /** How long a disconnected player has to come back before losing. */
     reconnectGraceMs: 2 * 60_000,
