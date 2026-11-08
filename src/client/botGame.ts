@@ -31,7 +31,11 @@ export interface BotGameSnapshot {
 }
 
 /** A game against a bot that runs entirely in the browser. */
+let games = 0
+
 export class BotGame {
+  /** Distinct per game, to reset the table between games. */
+  readonly id = ++games
   private snapshot: BotGameSnapshot
   private listeners = new Set<() => void>()
   private cancel: (() => void) | null = null
