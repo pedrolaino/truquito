@@ -73,3 +73,25 @@ export function scoreText(points: number, target: number): string {
   const [n, word] = points <= 15 ? [points, 'mala'] : [points - 15, 'buena']
   return `${n} ${word}${n === 1 ? '' : 's'}`
 }
+
+/** The few words a player says out loud for an event, for the speech bubble. */
+export function spokenText(event: GameEvent): string | null {
+  switch (event.type) {
+    case 'call':
+      return `¡${CALLS[event.call]}!`
+    case 'quiero':
+      return 'Quiero'
+    case 'noQuiero':
+      return 'No quiero'
+    case 'mazo':
+      return 'Me voy al mazo'
+    case 'flor':
+      return '¡Flor!'
+    case 'points':
+      return String(event.points)
+    case 'sonBuenas':
+      return 'Son buenas'
+    default:
+      return null
+  }
+}
