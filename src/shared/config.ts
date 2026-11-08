@@ -17,8 +17,8 @@ export const config = {
     maxNameLength: 20,
     maxMessageBytes: 1024,
     /** Per connection: at most this many messages in the window. */
-    messageBurst: 20,
-    messageWindowMs: 5_000,
+    messageBurst: 60,
+    messageWindowMs: 10_000,
     /** Per client IP and Worker isolate: rooms created in the window. */
     createBurst: 10,
     createWindowMs: 60_000,
