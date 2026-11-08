@@ -39,7 +39,9 @@ function act(state: GameState, seat: number, action: Action): GameState {
 }
 
 describe('every bot', () => {
-  it.each(Object.entries(bots))('%s only picks legal actions', (_, bot) => {
+  // Fewer samples keep the hard bot fast here; the sample count does not change which moves are legal.
+  const players = { ...bots, hard: createHardBot(8) }
+  it.each(Object.entries(players))('%s only picks legal actions', { timeout: 30_000 }, (_, bot) => {
     const random = seededRandom(7)
     for (let g = 0; g < 5; g++) {
       let state = createGame({ flor: g % 2 === 0, target: 15 }, g)
@@ -151,6 +153,21 @@ describe('hard bot', () => {
     s = act(s, 0, { type: 'play', card: c(4, 'oro') })
     const hands = possibleOpponentHands(viewFor(s, 1))
     expect(hands.every((h) => h.some((card) => sameCard(card, c(4, 'oro'))))).toBe(true)
+  })
+})
+
+describe('hard bot against people who accept', () => {
+  it('does not risk a falta envido with poor points', () => {
+    const poor = [c(7, 'espada'), c(4, 'copa'), c(10, 'oro')]
+    const other = [c(5, 'basto'), c(6, 'oro'), c(11, 'copa')]
+    const game = createGame({ flor: false, target: 15 }, 1)
+    game.scores = [0, 0]
+    startRound(game, 0, [poor, other])
+    const bot = createHardBot(40)
+    for (let seed = 1; seed <= 10; seed++) {
+      const action = bot(viewFor(game, 0), legalActions(game, 0), seededRandom(seed))
+      expect(action).not.toEqual({ type: 'envido', call: 'faltaEnvido' })
+    }
   })
 })
 
