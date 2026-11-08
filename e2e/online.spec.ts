@@ -58,7 +58,7 @@ test('a player who closes the browser gets the seat back', async ({ browser, con
     await Promise.all([move(a), move(b)])
     await Promise.all([a.clock.fastForward(2500), b.clock.fastForward(2500)])
   }
-  await expect(b.getByText(/Te toca|Esperando a Ana/)).toBeVisible()
+  await expect(b.locator('.turn')).toHaveText(/Te toca|Esperando a Ana/)
   await b.waitForTimeout(500)
   const hand = await cardNames(b)
 
