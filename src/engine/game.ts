@@ -6,8 +6,8 @@ import {
   hasFlor,
   cardPower,
   sameCard,
-} from './cards'
-import { nextRandom, shuffle } from './rng'
+} from './cards.ts'
+import { nextRandom, shuffle } from './rng.ts'
 
 export interface GameConfig {
   flor: boolean
@@ -372,6 +372,7 @@ function roundWinner(r: Round): number | null {
 }
 
 function endRound(state: GameState, winner: number, events: GameEvent[]) {
+  if (state.winner !== null) return
   const r = state.round
   addScore(state, winner, r.truco.level, 'round', events)
   r.winner = winner

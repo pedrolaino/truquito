@@ -8,7 +8,7 @@ import {
   envidoPoints,
   florPoints,
   hasFlor,
-} from './cards'
+} from './cards.ts'
 
 const c = (rank: Rank, suit: Suit): Card => ({ rank, suit })
 

@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
-import { type Card, createDeck, sameCard } from './cards'
-import { type GameState, actorOf, applyAction, createGame, legalActions, viewFor } from './game'
-import { nextRandom } from './rng'
+import { type Card, createDeck, sameCard } from './cards.ts'
+import { type GameState, actorOf, applyAction, createGame, legalActions, viewFor } from './game.ts'
+import { nextRandom } from './rng.ts'
 
 const GAMES = 2000
 const MAX_ACTIONS = 2000

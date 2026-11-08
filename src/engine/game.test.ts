@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import type { Card, Rank, Suit } from './cards'
+import type { Card, Rank, Suit } from './cards.ts'
 import {
   type Action,
   type GameConfig,
@@ -11,7 +11,7 @@ import {
   legalActions,
   startRound,
   viewFor,
-} from './game'
+} from './game.ts'
 
 const c = (rank: Rank, suit: Suit): Card => ({ rank, suit })
 const play = (card: Card): Action => ({ type: 'play', card })
@@ -516,6 +516,7 @@ describe('end of the game', () => {
     g.do(0, ENVIDO).do(1, REAL).do(0, MAZO)
     expect(g.state.scores).toEqual([0, 15])
     expect(g.scored()).toHaveLength(1)
+    expect(g.events.some((e) => e.type === 'roundEnd')).toBe(false)
   })
 
   it('caps the score at the target', () => {

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { nextRandom, shuffle } from './rng'
+import { nextRandom, shuffle } from './rng.ts'
 
 describe('rng', () => {
   it('is reproducible from the same seed', () => {
