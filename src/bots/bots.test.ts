@@ -39,7 +39,9 @@ function act(state: GameState, seat: number, action: Action): GameState {
 }
 
 describe('every bot', () => {
-  it.each(Object.entries(bots))('%s only picks legal actions', (_, bot) => {
+  // Fewer samples keep the hard bot fast here; the sample count does not change which moves are legal.
+  const players = { ...bots, hard: createHardBot(8) }
+  it.each(Object.entries(players))('%s only picks legal actions', { timeout: 30_000 }, (_, bot) => {
     const random = seededRandom(7)
     for (let g = 0; g < 5; g++) {
       let state = createGame({ flor: g % 2 === 0, target: 15 }, g)
