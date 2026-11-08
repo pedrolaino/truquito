@@ -56,8 +56,7 @@ export function usePresentation(
         return {
           view: stepView(base, event, view),
           index: s.index + 1,
-          announcement:
-            announce(event, names, view.seat, events.slice(0, s.index)) ?? s.announcement,
+          announcement: announce(event, names, view.seat, events.slice(0, s.index)),
           playing: event,
         }
       })
