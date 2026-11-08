@@ -33,3 +33,6 @@ export const saveToken = (roomId: string, token: string | null) =>
 export const savedTally = () => parseTally(read('truquito:tally'))
 export const saveTally = (tally: Tally | null) =>
   write('truquito:tally', tally && JSON.stringify(tally))
+
+export const savedMuted = () => read('truquito:muted') === '1'
+export const saveMuted = (muted: boolean) => write('truquito:muted', muted ? '1' : null)
