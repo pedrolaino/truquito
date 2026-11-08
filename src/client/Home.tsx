@@ -121,6 +121,14 @@ export function Home({ onPlayBot, navigate }: Props) {
 
         {error && <p role="alert">{error}</p>}
       </form>
+
+      <section aria-label="Anotador">
+        <h2>Anotador</h2>
+        <p>¿Jugás con cartas de verdad? Llevá los puntos acá.</p>
+        <button type="button" onClick={() => navigate('/anotador')}>
+          Abrir el anotador
+        </button>
+      </section>
     </main>
   )
 }

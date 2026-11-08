@@ -1,4 +1,5 @@
 import { cleanName, isId } from '../shared/protocol.ts'
+import { type Tally, parseTally } from './tally.ts'
 
 // Everything read back from localStorage is validated: it can be edited by hand.
 function read(key: string): string | null {
@@ -28,3 +29,7 @@ export function savedToken(roomId: string): string | null {
 
 export const saveToken = (roomId: string, token: string | null) =>
   write(`truquito:room:${roomId}`, token)
+
+export const savedTally = () => parseTally(read('truquito:tally'))
+export const saveTally = (tally: Tally | null) =>
+  write('truquito:tally', tally && JSON.stringify(tally))

@@ -70,5 +70,6 @@ export function eventText(event: GameEvent, names: string[]): string | null {
 /** At 30 points the score reads as malas (0 to 15) and buenas (16 to 30). */
 export function scoreText(points: number, target: number): string {
   if (target !== 30) return String(points)
-  return points <= 15 ? `${points} malas` : `${points - 15} buenas`
+  const [n, word] = points <= 15 ? [points, 'mala'] : [points - 15, 'buena']
+  return `${n} ${word}${n === 1 ? '' : 's'}`
 }
