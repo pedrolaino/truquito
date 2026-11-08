@@ -68,13 +68,27 @@ function stateWith(view: GameView, opponentHand: Card[]): GameState {
   return { ...rest, seed: 0, previous: null, round: { ...round, dealt } }
 }
 
-/** Plays the rest of the round with both sides on the medium heuristics. */
+/**
+ * How the simulated rival plays: medium heuristics, except that it wants any
+ * envido with 26 or more like a person would. The medium bot alone almost never
+ * accepts a falta envido, which made calling one look free.
+ */
+function rivalPolicy(view: GameView, legal: Action[], random: () => number): Action {
+  if (view.round.envido.status === 'pending') {
+    const wants = envidoPoints(view.round.dealt[view.seat]!) >= 26
+    return legal.find((a) => a.type === (wants ? 'quiero' : 'noQuiero'))!
+  }
+  return mediumBot(view, legal, random)
+}
+
+/** Plays the rest of the round: itself on the medium heuristics, the rival on `rivalPolicy`. */
 function rollout(start: GameState, me: number, random: () => number): number {
   let state = start
   const round = state.roundNumber
   while (state.winner === null && state.roundNumber === round) {
     const seat = actorOf(state)!
-    const action = mediumBot(viewFor(state, seat), legalActions(state, seat), random)
+    const policy = seat === me ? mediumBot : rivalPolicy
+    const action = policy(viewFor(state, seat), legalActions(state, seat), random)
     const result = applyAction(state, seat, action)
     if (!result.ok) throw new Error(result.error)
     state = result.state

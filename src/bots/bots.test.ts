@@ -154,6 +154,21 @@ describe('hard bot', () => {
   })
 })
 
+describe('hard bot against people who accept', () => {
+  it('does not risk a falta envido with poor points', () => {
+    const poor = [c(7, 'espada'), c(4, 'copa'), c(10, 'oro')]
+    const other = [c(5, 'basto'), c(6, 'oro'), c(11, 'copa')]
+    const game = createGame({ flor: false, target: 15 }, 1)
+    game.scores = [0, 0]
+    startRound(game, 0, [poor, other])
+    const bot = createHardBot(40)
+    for (let seed = 1; seed <= 10; seed++) {
+      const action = bot(viewFor(game, 0), legalActions(game, 0), seededRandom(seed))
+      expect(action).not.toEqual({ type: 'envido', call: 'faltaEnvido' })
+    }
+  })
+})
+
 describe('levels', () => {
   const game = { flor: false, target: 15 } as const
 
