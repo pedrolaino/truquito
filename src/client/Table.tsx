@@ -146,21 +146,23 @@ export function Table({ view: realView, names, events, onAction, rivalStatus, ov
           )}
         </div>
 
-        {announcement?.seat === me ? (
-          <p className="bubble bubble-me" key={shownEvents.length} aria-hidden="true">
-            {announcement.text}
-          </p>
-        ) : (
-          <p className="turn">
-            {busy
-              ? ''
-              : actor === null
-                ? 'Partida terminada'
-                : actor === me
-                  ? 'Te toca'
-                  : `Esperando a ${names[actor]}…`}
-          </p>
-        )}
+        <div className="turn-slot">
+          {announcement?.seat === me ? (
+            <p className="bubble bubble-me" key={shownEvents.length} aria-hidden="true">
+              {announcement.text}
+            </p>
+          ) : (
+            <p className="turn">
+              {busy
+                ? ''
+                : actor === null
+                  ? 'Partida terminada'
+                  : actor === me
+                    ? 'Te toca'
+                    : `Esperando a ${names[actor]}…`}
+            </p>
+          )}
+        </div>
 
         <div
           role="group"
@@ -178,7 +180,13 @@ export function Table({ view: realView, names, events, onAction, rivalStatus, ov
           ))}
         </div>
 
-        <div role="group" aria-label="Cantos" className="calls">
+        <div
+          role="group"
+          aria-label="Cantos"
+          className="calls"
+          // Two rows always: fewer buttons get wider, so long calls fit.
+          style={{ '--cols': calls.length <= 4 ? 2 : calls.length <= 6 ? 3 : 4 } as CSSProperties}
+        >
           {calls.map((action) => (
             <button
               key={actionLabel(action, view)}

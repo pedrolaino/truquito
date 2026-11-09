@@ -604,8 +604,11 @@ button.card:disabled {
 }
 
 .bubble-me {
-  position: static;
-  align-self: center;
+  position: absolute;
+  left: 50%;
+  top: 0;
+  translate: -50% 0;
+  width: max-content;
   max-width: 80%;
   border-radius: 16px 16px 16px 4px;
   background: var(--accent);
@@ -664,10 +667,17 @@ button.card:disabled {
   color: var(--ink);
 }
 
+/* Fixed height so the bubble or the turn line never pushes the cards around. */
+.turn-slot {
+  position: relative;
+  height: 48px;
+  display: grid;
+  place-items: center;
+}
+
 .turn {
   text-align: center;
   font-weight: 700;
-  min-height: 24px;
 }
 
 .hand {
@@ -683,14 +693,20 @@ button.card:disabled {
   animation-delay: calc(var(--i) * 90ms);
 }
 
+/* Always two rows tall, even when empty, so the cards above never move. */
 .calls {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(var(--cols, 4), minmax(0, 1fr));
+  grid-auto-rows: var(--touch);
+  align-content: start;
   gap: 8px;
+  height: calc(var(--touch) * 2 + 8px);
 }
 
-.calls .btn-quiet {
-  grid-column: 1 / -1;
+.calls .btn {
+  min-height: 0;
+  padding: 4px 6px;
+  font-size: 14px;
 }
 
 .log {
@@ -722,10 +738,7 @@ button.card:disabled {
     grid-template-columns: none;
     grid-auto-flow: column;
     grid-auto-columns: minmax(0, 1fr);
-  }
-
-  .calls .btn-quiet {
-    grid-column: auto;
+    height: var(--touch);
   }
 
   .log {
