@@ -56,7 +56,7 @@ test('a learner can go through every lesson', async ({ page }) => {
 test('the helper suggests a move and the learner can follow it', async ({ page }) => {
   await page.clock.install()
   await page.goto('/aprender/ayudante')
-  const coach = page.locator('.coach')
+  const coach = page.locator('.tip')
   for (let i = 0; i < 6; i++) {
     await page.clock.fastForward(2500)
     const suggested = page.locator('.suggested').first()
@@ -65,7 +65,10 @@ test('the helper suggests a move and the learner can follow it', async ({ page }
       await suggested.click({ timeout: 1000 }).catch(() => {})
     }
   }
-  await page.getByRole('button', { name: 'Ocultar ayuda' }).click()
-  await expect(coach).toHaveText(/La ayuda está apagada/)
+  const toggle = page.getByRole('button', { name: 'Ayuda' })
+  await expect(toggle).toHaveAttribute('aria-pressed', 'true')
+  await toggle.click()
+  await expect(toggle).toHaveAttribute('aria-pressed', 'false')
+  await expect(coach).toHaveCount(0)
   await expect(page.locator('.suggested')).toHaveCount(0)
 })
