@@ -1,6 +1,13 @@
 import { handStrength } from '../../bots/medium.ts'
 import { type Card, cardPower, envidoPoints } from '../../engine/cards.ts'
-import { type Action, type GameView, handOf, nextSeat } from '../../engine/game.ts'
+import {
+  type Action,
+  type GameView,
+  type Trick,
+  handOf,
+  nextSeat,
+  roundWinner,
+} from '../../engine/game.ts'
 import { cardName } from '../text.ts'
 
 export interface Advice {
@@ -15,6 +22,37 @@ const has = (legal: Action[], action: Action) =>
       (a.type !== 'envido' || (action.type === 'envido' && a.call === action.call)),
   )
 
+const RAISES = { 1: 'truco', 2: 'retruco', 3: 'vale cuatro' } as const
+
+/** Whether every card in hand loses the round once the rival's card is on the table. */
+function handIsLost(view: GameView): boolean {
+  const r = view.round
+  const me = view.seat
+  const rival = nextSeat(view, me)
+  const theirs = r.tricks.at(-1)!.cards[rival]
+  if (!theirs) return false
+  return handOf(r, me).every((card) => {
+    const diff = cardPower(card) - cardPower(theirs)
+    const winner: Trick['winner'] = diff > 0 ? me : diff < 0 ? rival : 'parda'
+    const tricks = [...r.tricks.slice(0, -1), { ...r.tricks.at(-1)!, winner }]
+    return roundWinner({ tricks, mano: r.mano }) === rival
+  })
+}
+
+/** Nothing in hand saves the round: leave it, or bluff a raise so the rival gives it up. */
+function lostAdvice(view: GameView, legal: Action[]): Advice | null {
+  if (!has(legal, { type: 'mazo' })) return null
+  const r = view.round
+  const bluff =
+    has(legal, { type: 'truco' }) && r.truco.level < 4
+      ? ` O mentí y cantá ${RAISES[r.truco.level as 1 | 2 | 3]}: si no te lo quieren, te llevás ${r.truco.level}.`
+      : ''
+  return {
+    action: { type: 'mazo' },
+    why: `No le ganás con ninguna: esta mano está perdida. Podés irte al mazo.${bluff}`,
+  }
+}
+
 /** The card to play now and why, as an average player would think it. */
 function cardAdvice(view: GameView): Advice {
   const r = view.round
@@ -23,6 +61,7 @@ function cardAdvice(view: GameView): Advice {
   const sorted = handOf(r, me).sort((a, b) => cardPower(a) - cardPower(b))
   const play = (card: Card, why: string): Advice => ({ action: { type: 'play', card }, why })
 
+  if (sorted.length === 1) return play(sorted[0]!, `Te queda el ${cardName(sorted[0]!)}: tiralo.`)
   if (theirs) {
     const beat = sorted.find((c) => cardPower(c) > cardPower(theirs))
     if (beat)
@@ -38,7 +77,7 @@ function cardAdvice(view: GameView): Advice {
       )
     return play(
       sorted[0]!,
-      `No le ganás: tirá el ${cardName(sorted[0]!)}, tu carta más baja, y guardá las buenas.`,
+      `No le ganás: tirá el ${cardName(sorted[0]!)}, tu carta más baja, y guardá las buenas para las próximas bazas.`,
     )
   }
   if (r.tricks.length === 1 && sorted.length === 3)
@@ -87,6 +126,10 @@ export function advise(view: GameView, legal: Action[]): Advice | null {
 
   if (points >= 27 && has(legal, envido))
     return { action: envido, why: `Tenés ${points} de envido: cantalo antes de tirar.` }
+  if (handIsLost(view)) {
+    const lost = lostAdvice(view, legal)
+    if (lost) return lost
+  }
   if (strength > 0.75 && has(legal, { type: 'truco' }))
     return { action: { type: 'truco' }, why: 'Tenés cartas fuertes: cantá truco.' }
   return cardAdvice(view)

@@ -360,7 +360,8 @@ function playCard(state: GameState, seat: number, card: Card, events: GameEvent[
   r.turn = lead
 }
 
-function roundWinner(r: Round): number | null {
+/** Who won the round given its tricks so far, or null while it is still open. */
+export function roundWinner(r: Pick<Round, 'tricks' | 'mano'>): number | null {
   const [a, b, c] = r.tricks.map((t) => t.winner)
   if (c !== undefined) {
     if (c !== 'parda') return c
