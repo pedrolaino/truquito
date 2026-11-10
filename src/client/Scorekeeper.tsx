@@ -1,18 +1,30 @@
 import { House, Minus } from 'lucide-react'
 import { useState } from 'react'
 import { Fosforos } from './Fosforos.tsx'
+import { Puntas } from './Puntas.tsx'
 import { saveTally, savedTally } from './storage.ts'
-import { type Tally, addPoint, newTally, tallyWinner } from './tally.ts'
+import {
+  type Tally,
+  addPoint,
+  addPunta,
+  finishPuntas,
+  newTally,
+  startPuntas,
+  tallyWinner,
+} from './tally.ts'
 import { scoreText } from './text.ts'
 
 const TEAMS = ['Nosotros', 'Ellos'] as const
+type Team = 0 | 1
 
 /** Score counter for a game played with real cards. */
 export function Scorekeeper({ onExit }: { onExit: () => void }) {
   const [tally, setTally] = useState<Tally | null>(savedTally)
+  const [lastPuntas, setLastPuntas] = useState<string | null>(null)
   const update = (next: Tally | null) => {
     setTally(next)
     saveTally(next)
+    setLastPuntas(null)
   }
 
   if (!tally)
@@ -42,53 +54,79 @@ export function Scorekeeper({ onExit }: { onExit: () => void }) {
 
   const winner = tallyWinner(tally)
   return (
-    <main className="tally">
-      <div className="tally-head">
-        <h1>Anotador</h1>
-        <p>A {tally.target}</p>
-      </div>
-      {TEAMS.map((team, i) => (
-        <section key={team} aria-label={team} className={winner === i ? 'team winner' : 'team'}>
-          <button
-            type="button"
-            className="team-add"
-            disabled={winner !== null}
-            aria-label={`Sumar un punto a ${team}`}
-            onClick={() => update(addPoint(tally, i as 0 | 1, 1))}
-          >
-            <span className="team-name" aria-hidden="true">
-              {team}{' '}
-              <span className="team-points">{scoreText(tally.points[i]!, tally.target)}</span>
+    <>
+      {/* The regular score stays behind the puntas dialog, out of reach until it closes. */}
+      <main className="tally" inert={tally.puntas !== null}>
+        <div className="tally-head">
+          <h1>Anotador</h1>
+          <p>A {tally.target}</p>
+        </div>
+        {TEAMS.map((team, i) => (
+          <section key={team} aria-label={team} className={winner === i ? 'team winner' : 'team'}>
+            <button
+              type="button"
+              className="team-add"
+              disabled={winner !== null}
+              aria-label={`Sumar un punto a ${team}`}
+              onClick={() => update(addPoint(tally, i as Team, 1))}
+            >
+              <span className="team-name" aria-hidden="true">
+                {team}{' '}
+                <span className="team-points">{scoreText(tally.points[i]!, tally.target)}</span>
+              </span>
+              <Fosforos points={tally.points[i]!} target={tally.target} big />
+            </button>
+            <span className="sr-only" aria-live="polite">
+              {team}: {scoreText(tally.points[i]!, tally.target)}
             </span>
-            <Fosforos points={tally.points[i]!} target={tally.target} big />
-          </button>
-          <span className="sr-only" aria-live="polite">
-            {team}: {scoreText(tally.points[i]!, tally.target)}
-          </span>
+            <button
+              type="button"
+              className="btn team-minus"
+              disabled={tally.points[i] === 0}
+              aria-label={`Restar un punto a ${team}`}
+              onClick={() => update(addPoint(tally, i as Team, -1))}
+            >
+              <Minus aria-hidden="true" /> 1
+            </button>
+          </section>
+        ))}
+        <div className="tally-foot row">
+          {lastPuntas && (
+            <p role="status" className="alert" style={{ flexBasis: '100%' }}>
+              Puntas: {lastPuntas}
+            </p>
+          )}
+          {winner !== null && (
+            <p role="status" className="alert" style={{ flexBasis: '100%' }}>
+              ¡Ganaron {TEAMS[winner]}!
+            </p>
+          )}
           <button
             type="button"
-            className="btn team-minus"
-            disabled={tally.points[i] === 0}
-            aria-label={`Restar un punto a ${team}`}
-            onClick={() => update(addPoint(tally, i as 0 | 1, -1))}
+            className="btn btn-primary"
+            disabled={winner !== null}
+            onClick={() => update(startPuntas(tally))}
           >
-            <Minus aria-hidden="true" /> 1
+            Jugar puntas
           </button>
-        </section>
-      ))}
-      <div className="tally-foot row">
-        {winner !== null && (
-          <p role="status" className="alert" style={{ flexBasis: '100%' }}>
-            ¡Ganaron {TEAMS[winner]}!
-          </p>
-        )}
-        <button type="button" className="btn" onClick={() => update(null)}>
-          Nueva partida
-        </button>
-        <button type="button" className="btn btn-quiet" onClick={onExit}>
-          <House aria-hidden="true" /> Inicio
-        </button>
-      </div>
-    </main>
+          <button type="button" className="btn" onClick={() => update(null)}>
+            Nueva partida
+          </button>
+          <button type="button" className="btn btn-quiet" onClick={onExit}>
+            <House aria-hidden="true" /> Inicio
+          </button>
+        </div>
+      </main>
+      {tally.puntas && (
+        <Puntas
+          tally={tally}
+          onPoint={(team, delta) => update(addPunta(tally, team, delta))}
+          onFinish={(summary) => {
+            update(finishPuntas(tally))
+            setLastPuntas(summary)
+          }}
+        />
+      )}
+    </>
   )
 }

@@ -779,6 +779,62 @@ button.card:disabled {
   z-index: 10;
 }
 
+.overlay-center {
+  place-items: center;
+}
+
+.puntas {
+  gap: 12px;
+}
+
+.puntas-help {
+  color: var(--muted);
+  font-size: 15px;
+}
+
+.puntas-teams {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.puntas-team {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 12px 8px;
+  border: var(--border) solid var(--line);
+  border-radius: var(--radius);
+}
+
+.puntas-name {
+  font-weight: 700;
+}
+
+.puntas-count {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 40px;
+  line-height: 1;
+}
+
+.puntas-team .fosforos-row {
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.puntas-buttons {
+  display: flex;
+  gap: 8px;
+}
+
+.puntas-result {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 22px;
+}
+
 .overlay .panel {
   width: 100%;
   max-width: 440px;

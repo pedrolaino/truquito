@@ -47,7 +47,7 @@ function Row({ points }: { points: number }) {
   )
 }
 
-/** Points as matchsticks; at 30 the malas and buenas go on separate rows. */
+/** Points as matchsticks; at 30 the malas and buenas go on separate rows. Pass target 0 for a plain count. */
 export function Fosforos({
   points,
   target,
@@ -59,7 +59,7 @@ export function Fosforos({
 }) {
   return (
     <span className={big ? 'fosforos fosforos-big' : 'fosforos'} aria-hidden="true">
-      <Row points={Math.min(points, 15)} />
+      <Row points={target === 30 ? Math.min(points, 15) : points} />
       {target === 30 && points > 15 && <Row points={points - 15} />}
     </span>
   )

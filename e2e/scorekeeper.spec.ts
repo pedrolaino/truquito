@@ -24,3 +24,33 @@ test('keeps the score of a real game and survives a reload', async ({ page }) =>
   await page.getByRole('button', { name: 'Nueva partida' }).click()
   await expect(page.getByRole('button', { name: 'A 15' })).toBeVisible()
 })
+
+test('plays puntas apart from the score and adds only the difference', async ({ page }) => {
+  await page.goto('/anotador')
+  await page.getByRole('button', { name: 'A 30' }).click()
+  const nosotros = page.getByRole('button', { name: 'Sumar un punto a Nosotros' })
+  const ellos = page.getByRole('button', { name: 'Sumar un punto a Ellos' })
+  await nosotros.click()
+
+  await page.getByRole('button', { name: 'Jugar puntas' }).click()
+  const puntas = page.getByRole('dialog', { name: 'Puntas' })
+  await expect(puntas).toBeVisible()
+  const ours = puntas.getByRole('button', { name: 'Sumar un punto de puntas a Nosotros' })
+  const theirs = puntas.getByRole('button', { name: 'Sumar un punto de puntas a Ellos' })
+  for (let i = 0; i < 5; i++) await ours.click()
+  for (let i = 0; i < 7; i++) await theirs.click()
+  // The regular score stays in view behind the dialog but cannot be touched.
+  await expect(nosotros.click({ timeout: 500 })).rejects.toThrow()
+
+  await page.reload()
+  await expect(puntas).toContainText('5')
+
+  await puntas.getByRole('button', { name: 'Terminar puntas' }).click()
+  await expect(puntas).toContainText('Nosotros 5, Ellos 7: +2 para Ellos')
+  await puntas.getByRole('button', { name: 'Sumar al anotador' }).click()
+
+  await expect(puntas).toBeHidden()
+  await expect(page.getByRole('status')).toContainText('+2 para Ellos')
+  await expect(nosotros).toContainText('1 mala')
+  await expect(ellos).toContainText('2 malas')
+})
