@@ -38,6 +38,8 @@ interface Props {
   hideScore?: boolean
   /** Lessons: play moves out slower so a beginner can follow them. */
   slow?: boolean
+  /** Practice with the coach: advice shown right above the hand instead of the turn line. */
+  tip?: string | null
   /** Told whenever moves start or stop playing out on screen. */
   onBusyChange?: (busy: boolean) => void
 }
@@ -55,6 +57,7 @@ export function Table({
   highlight,
   hideScore,
   slow,
+  tip,
   onBusyChange,
 }: Props) {
   const [muted, setMuted] = useState(savedMuted)
@@ -184,10 +187,14 @@ export function Table({
           )}
         </div>
 
-        <div className="turn-slot">
+        <div className={tip === undefined ? 'turn-slot' : 'turn-slot has-tip'}>
           {announcement?.seat === me ? (
             <p className="bubble bubble-me" key={shownEvents.length} aria-hidden="true">
               {announcement.text}
+            </p>
+          ) : tip !== undefined ? (
+            <p className="tip" role="status">
+              {tip}
             </p>
           ) : (
             <p className="turn">

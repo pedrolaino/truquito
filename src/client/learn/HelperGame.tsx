@@ -1,4 +1,4 @@
-import { ChevronLeft, Lightbulb, RotateCcw } from 'lucide-react'
+import { ChevronLeft, Lightbulb, LightbulbOff, RotateCcw } from 'lucide-react'
 import { useCallback, useEffect, useState, useSyncExternalStore } from 'react'
 import { seededRandom } from '../../bots/match.ts'
 import { actorOf, legalActions, viewFor } from '../../engine/game.ts'
@@ -8,7 +8,6 @@ import { GameOver } from '../GameOver.tsx'
 import { Table } from '../Table.tsx'
 import { advise } from './coach.ts'
 import { sameAction } from './lesson.ts'
-import { scrollToSuggestion } from './scroll.ts'
 
 const randomSeed = () => crypto.getRandomValues(new Uint32Array(1))[0]!
 
@@ -40,34 +39,33 @@ export function HelperGame({ onExit }: { onExit: () => void }) {
   const view = viewFor(state, HUMAN)
   const myTurn = state.winner === null && actorOf(state) === HUMAN && !busy
   const advice = myTurn ? advise(view, legalActions(state, HUMAN)) : null
-  const hinted = hints && advice ? JSON.stringify(advice.action) : null
-  useEffect(() => scrollToSuggestion(), [hinted])
   if (failed) throw new Error('The bot stopped working')
 
+  // The advice sits right above the hand, where the learner is looking.
+  const tip = !hints
+    ? undefined
+    : advice
+      ? advice.why
+      : state.winner === null
+        ? 'Mirá lo que hace el rival…'
+        : null
+
   return (
-    <main className="lesson lesson-play">
-      <header className="lesson-bar">
-        <button type="button" className="back" onClick={onExit}>
-          <ChevronLeft aria-hidden="true" /> Aprender
+    <main className="helper">
+      <header className="helper-bar">
+        <button type="button" className="icon-btn" aria-label="Volver a Aprender" onClick={onExit}>
+          <ChevronLeft aria-hidden="true" />
         </button>
+        <h1>Partida con ayudante</h1>
         <button
           type="button"
           className="btn btn-quiet hint-toggle"
           aria-pressed={hints}
           onClick={() => setHints(!hints)}
         >
-          <Lightbulb aria-hidden="true" /> {hints ? 'Ocultar ayuda' : 'Mostrar ayuda'}
+          {hints ? <Lightbulb aria-hidden="true" /> : <LightbulbOff aria-hidden="true" />} Ayuda
         </button>
       </header>
-      <p className="coach" role="status">
-        {!hints
-          ? 'La ayuda está apagada. Prendela cuando la necesites.'
-          : advice
-            ? advice.why
-            : state.winner === null
-              ? 'Mirá lo que hace el rival…'
-              : ''}
-      </p>
       <Table
         key={game.id}
         view={view}
@@ -75,6 +73,7 @@ export function HelperGame({ onExit }: { onExit: () => void }) {
         events={events}
         onAction={(a) => game.play(a)}
         highlight={hints && advice ? (a) => sameAction(a, advice.action) : undefined}
+        tip={tip}
         onBusyChange={onBusyChange}
         over={
           state.winner !== null && (
