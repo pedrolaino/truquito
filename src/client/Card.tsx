@@ -109,16 +109,19 @@ export function CardButton({
   disabled,
   onPlay,
   style,
+  suggested,
 }: {
   card: CardData
   disabled: boolean
   onPlay: () => void
   style?: CSSProperties
+  /** Lessons: the card the learner is asked to play. */
+  suggested?: boolean
 }) {
   return (
     <button
       type="button"
-      className="card"
+      className={suggested ? 'card suggested' : 'card'}
       aria-label={cardName(card)}
       disabled={disabled}
       onClick={onPlay}

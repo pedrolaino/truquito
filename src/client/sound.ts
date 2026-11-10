@@ -1,4 +1,5 @@
 import type { GameEvent } from '../engine/game.ts'
+import { savedMuted } from './storage.ts'
 
 // Short sounds made with the Web Audio API, so there are no audio files.
 let audio: AudioContext | null = null
@@ -74,4 +75,11 @@ export function playSound(event: GameEvent, me: number) {
     default:
       return
   }
+}
+
+/** Right or wrong answer in a lesson. */
+export function playFeedback(right: boolean) {
+  if (savedMuted()) return
+  if (right) notes([659, 880], 0.09, 0.22)
+  else notes([330, 262], 0.12, 0.25)
 }

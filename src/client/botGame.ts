@@ -30,9 +30,9 @@ export interface BotGameSnapshot {
   failed: boolean
 }
 
-/** A game against a bot that runs entirely in the browser. */
 let games = 0
 
+/** A game against a bot that runs entirely in the browser. */
 export class BotGame {
   /** Distinct per game, to reset the table between games. */
   readonly id = ++games
@@ -48,8 +48,10 @@ export class BotGame {
     private decide: Decide,
     private schedule: Schedule,
     private random: () => number,
+    /** Start from this state instead of a fresh deal, e.g. a lesson's prepared hands. */
+    initial?: GameState,
   ) {
-    this.snapshot = { state: createGame(config, seed), events: [], failed: false }
+    this.snapshot = { state: initial ?? createGame(config, seed), events: [], failed: false }
     this.botTurn()
   }
 

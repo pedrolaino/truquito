@@ -24,3 +24,31 @@ test('the quick guide compares cards and opens over a game', async ({ page }) =>
   await expect(sheet).toBeHidden()
   await expect(page.getByRole('region', { name: 'Mesa' })).toBeVisible()
 })
+
+test('a learner can go through every lesson', async ({ page }) => {
+  test.setTimeout(120_000)
+  await page.clock.install()
+  await page.goto('/aprender')
+  await page.getByRole('button', { name: /De qué se trata/ }).click()
+
+  const finished = page.getByRole('heading', { name: '¡Lección terminada!' })
+  const nextLesson = page.getByRole('button', { name: /^Seguir: / })
+  for (let lessons = 0; lessons < 20; lessons++) {
+    for (let i = 0; i < 80 && !(await finished.isVisible()); i++) {
+      const go = page.getByRole('button', { name: /^(Empezar|Seguir)$/ })
+      const option = page.locator('.quiz-option, .quiz-card').first()
+      const cue = page.locator('.suggested').first()
+      if (await go.isVisible()) await go.click()
+      else if (await option.isVisible()) await option.click()
+      else if (await cue.isVisible()) await cue.click({ timeout: 1000 }).catch(() => {})
+      await page.clock.fastForward(1500)
+    }
+    await expect(finished).toBeVisible()
+    if (!(await nextLesson.isVisible())) break
+    await nextLesson.click()
+  }
+
+  await page.getByRole('button', { name: 'Volver al menú' }).click()
+  await expect(page.getByText('¡Terminaste todas las lecciones!')).toBeVisible()
+  await expect(page.locator('.learn-number.is-done')).toHaveCount(8)
+})

@@ -3,8 +3,7 @@ import type { Level } from '../bots/index.ts'
 import type { GameConfig } from '../engine/game.ts'
 import { BotMatch } from './BotMatch.tsx'
 import { Home } from './Home.tsx'
-import { GuidePage } from './learn/GuidePage.tsx'
-import { LearnHub } from './learn/LearnHub.tsx'
+import { Learn } from './learn/Learn.tsx'
 import { OnlineRoom } from './OnlineRoom.tsx'
 import { Scorekeeper } from './Scorekeeper.tsx'
 
@@ -26,8 +25,8 @@ export function App() {
   const room = path.match(/^\/r\/([0-9a-f]{32})$/)
   if (room) return <OnlineRoom key={room[1]} roomId={room[1]!} navigate={navigate} />
   if (path === '/anotador') return <Scorekeeper onExit={() => navigate('/')} />
-  if (path === '/aprender') return <LearnHub navigate={navigate} />
-  if (path === '/aprender/guia') return <GuidePage navigate={navigate} />
+  if (path === '/aprender' || path.startsWith('/aprender/'))
+    return <Learn path={path} navigate={navigate} />
   if (path !== '/')
     return (
       <main className="page">

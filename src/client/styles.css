@@ -14,6 +14,9 @@
   --wood: #c99a5b;
   --match-head: #c7431e;
   --focus: #1b2a41;
+  --ok: #2b7a4b;
+  --ok-bg: #e4f2e9;
+  --wrong-bg: #fbe8e2;
 
   --font-display: 'Bricolage Grotesque Variable', 'Arial Narrow', sans-serif;
   --font-body: 'Inter Variable', system-ui, sans-serif;
@@ -1041,6 +1044,9 @@ button.card:disabled {
 }
 
 .learn-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
   display: flex;
   flex-direction: column;
   gap: 12px;
@@ -1320,4 +1326,342 @@ button.card:disabled {
   left: calc(var(--gutter) + 52px);
   top: calc(100% + 12px);
   z-index: 3;
+}
+
+.learn-progress {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 52px;
+  font-weight: 700;
+}
+
+.learn-number {
+  width: 36px;
+  height: 36px;
+  flex: none;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  border: var(--border) solid var(--ink);
+  font-family: var(--font-display);
+  font-weight: 800;
+}
+
+.learn-number.is-done {
+  background: var(--ok);
+  border-color: var(--ok);
+  color: #fff;
+}
+
+.learn-number svg {
+  width: 20px;
+  height: 20px;
+}
+
+.learn-item.is-next {
+  border-color: var(--accent);
+  box-shadow: 4px 4px 0 var(--accent);
+}
+
+/* ---------- Lessons ---------- */
+
+.lesson {
+  flex: 1;
+  width: 100%;
+  max-width: 600px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.lesson-bar {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 12px var(--gutter);
+}
+
+.lesson-progress {
+  flex: 1;
+  height: 12px;
+  border-radius: 99px;
+  background: color-mix(in srgb, var(--line) 60%, transparent);
+  overflow: hidden;
+}
+
+.lesson-progress span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--accent);
+  transition: width 400ms var(--ease-out);
+}
+
+.lesson-step {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 12px var(--gutter) 24px;
+  animation: step-in 320ms var(--ease-out) both;
+}
+
+.lesson-step h1 {
+  font-size: 30px;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+}
+
+.lesson-text {
+  font-size: 19px;
+  line-height: 1.5;
+}
+
+.lesson-visual {
+  display: grid;
+  place-items: center;
+  min-height: 150px;
+  padding: 8px 0;
+}
+
+.lesson-actions {
+  margin-top: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.lesson-actions .btn {
+  min-height: 54px;
+  font-size: 17px;
+}
+
+.lesson-cards {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 14px;
+}
+
+.lesson-cards .card {
+  --card-w: 72px;
+}
+
+.lesson-card {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.lesson-card figcaption {
+  font-size: 14px;
+  font-weight: 700;
+  text-align: center;
+  max-width: 90px;
+}
+
+.lesson-chips {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.lesson-chips li {
+  display: flex;
+  justify-content: space-between;
+  padding: 12px 16px;
+  border: var(--border) solid var(--ink);
+  border-radius: var(--radius);
+  background: var(--card);
+  box-shadow: 3px 3px 0 var(--ink);
+}
+
+.quiz-options {
+  display: grid;
+  gap: 10px;
+}
+
+.quiz-cards {
+  grid-template-columns: 1fr 1fr;
+  justify-items: center;
+}
+
+.quiz-cards .quiz-option {
+  grid-column: 1 / -1;
+  width: 100%;
+}
+
+.quiz-option {
+  min-height: 56px;
+  font-size: 18px;
+}
+
+.quiz-card {
+  padding: 0;
+  border: 0;
+  background: none;
+  border-radius: 12px;
+  cursor: pointer;
+  transition:
+    transform 160ms var(--ease-out),
+    opacity 160ms;
+}
+
+.quiz-card .card {
+  --card-w: 112px;
+}
+
+.quiz-card:active:not(:disabled) {
+  transform: scale(0.96);
+}
+
+.is-right {
+  outline: 4px solid var(--ok);
+  outline-offset: 4px;
+}
+
+.quiz-card.is-right,
+.quiz-option.is-right {
+  animation: pop 260ms var(--ease-out) both;
+}
+
+.quiz-card.is-wrong,
+.quiz-option.is-wrong {
+  outline: 4px solid var(--accent);
+  outline-offset: 4px;
+  animation: shake 380ms ease both;
+}
+
+.is-faded {
+  opacity: 0.4;
+}
+
+.feedback {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 16px;
+  border: var(--border) solid var(--ink);
+  border-radius: var(--radius);
+  outline: none;
+  animation: rise 260ms var(--ease-out) both;
+}
+
+.feedback strong {
+  font-family: var(--font-display);
+  font-size: 24px;
+}
+
+.feedback.is-right {
+  background: var(--ok-bg);
+  border-left: 8px solid var(--ok);
+}
+
+.feedback.is-wrong {
+  background: var(--wrong-bg);
+  border-left: 8px solid var(--accent);
+}
+
+.overlay .feedback.is-right {
+  background: var(--ok-bg);
+}
+
+.lesson-play {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.coach {
+  margin: 0 var(--gutter);
+  min-height: 66px;
+  padding: 10px 14px;
+  display: flex;
+  align-items: center;
+  border-radius: var(--radius);
+  background: var(--ink);
+  color: var(--card);
+  font-weight: 700;
+  line-height: 1.35;
+}
+
+.lesson-play .game {
+  max-width: none;
+}
+
+.card.suggested,
+.btn.suggested {
+  animation: nudge 1.4s ease-in-out infinite;
+}
+
+.lesson-done {
+  align-items: center;
+  text-align: center;
+}
+
+.done-check {
+  width: 84px;
+  height: 84px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--ok);
+  color: #fff;
+  animation: pop 420ms var(--ease-out) both;
+}
+
+.done-check svg {
+  width: 44px;
+  height: 44px;
+}
+
+.lesson-done .lesson-actions {
+  width: 100%;
+}
+
+@keyframes step-in {
+  from {
+    opacity: 0;
+    transform: translateX(28px);
+  }
+}
+
+@keyframes shake {
+  20%,
+  60% {
+    transform: translateX(-6px);
+  }
+  40%,
+  80% {
+    transform: translateX(6px);
+  }
+}
+
+@keyframes nudge {
+  0%,
+  100% {
+    box-shadow:
+      3px 3px 0 var(--ink),
+      0 0 0 0 color-mix(in srgb, var(--accent) 60%, transparent);
+  }
+  50% {
+    box-shadow:
+      3px 3px 0 var(--ink),
+      0 0 0 6px color-mix(in srgb, var(--accent) 35%, transparent);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card.suggested,
+  .btn.suggested {
+    outline: 3px solid var(--accent);
+    outline-offset: 2px;
+  }
 }
