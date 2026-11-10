@@ -13,7 +13,8 @@ import { CardBack, CardButton, CardView } from './Card.tsx'
 import { Fosforos } from './Fosforos.tsx'
 import { actionLabel, eventText, scoreText } from './text.ts'
 import { useState } from 'react'
-import { Volume2, VolumeX } from 'lucide-react'
+import { CircleHelp, Volume2, VolumeX } from 'lucide-react'
+import { GuideSheet } from './learn/GuideSheet.tsx'
 import { playSound } from './sound.ts'
 import { saveMuted, savedMuted } from './storage.ts'
 import { usePresentation } from './usePresentation.ts'
@@ -34,6 +35,7 @@ const tilt = (deg: number) => ({ '--tilt': `${deg}deg` }) as CSSProperties
 
 export function Table({ view: realView, names, events, onAction, rivalStatus, over }: Props) {
   const [muted, setMuted] = useState(savedMuted)
+  const [guide, setGuide] = useState(false)
   const { view, busy, announcement, shownEvents } = usePresentation(
     realView,
     events,
@@ -80,6 +82,15 @@ export function Table({ view: realView, names, events, onAction, rivalStatus, ov
           }}
         >
           {muted ? <VolumeX aria-hidden="true" /> : <Volume2 aria-hidden="true" />}
+        </button>
+        <button
+          type="button"
+          className="guide-toggle"
+          aria-label="Guía rápida"
+          title="Guía rápida"
+          onClick={() => setGuide(true)}
+        >
+          <CircleHelp aria-hidden="true" />
         </button>
         <p className="round-info">
           <b>Ronda {view.roundNumber}</b>A {view.config.target},{' '}
@@ -213,6 +224,7 @@ export function Table({ view: realView, names, events, onAction, rivalStatus, ov
         ))}
       </aside>
       {!busy && over}
+      {guide && <GuideSheet onClose={() => setGuide(false)} />}
       <div className="sr-only" aria-live="polite">
         {announcement && <p key={shownEvents.length}>{announcement.text}</p>}
         {!busy && actor === me && <p>Te toca</p>}

@@ -1,5 +1,5 @@
 import { type CSSProperties, type FormEvent, useState } from 'react'
-import { Bot, Link2, Play, Users } from 'lucide-react'
+import { Bot, ChevronRight, GraduationCap, Link2, Play, Users } from 'lucide-react'
 import type { Level } from '../bots/index.ts'
 import type { GameConfig } from '../engine/game.ts'
 import { cleanName } from '../shared/protocol.ts'
@@ -65,6 +65,14 @@ export function Home({ onPlayBot, navigate }: Props) {
           Truco argentino para jugar contra el bot o con quien quieras, por link.
         </p>
       </div>
+
+      <button type="button" className="learn-banner" onClick={() => navigate('/aprender')}>
+        <GraduationCap aria-hidden="true" />
+        <span>
+          <strong>¿No sabés jugar?</strong> Aprendé el truco paso a paso
+        </span>
+        <ChevronRight aria-hidden="true" />
+      </button>
 
       <form onSubmit={createRoom} className="page" style={{ padding: 0 }}>
         <label className="field">
