@@ -297,7 +297,7 @@ describe('envido', () => {
   })
 
   it('mano that already played cannot call it', () => {
-    const g = new Game(setup([manoHand, pieHand])).plays(manoHand[2]!).do(1, TRUCO)
+    const g = new Game(setup([manoHand, pieHand])).plays(manoHand[1]!).do(1, TRUCO)
     expect(has(g.state, 0, ENVIDO)).toBe(false)
   })
 
@@ -430,10 +430,21 @@ describe('truco', () => {
     ])
   })
 
+  it('cannot be called or raised on a 4 until you play', () => {
+    const g = new Game(setup([a, b])).plays(a[2]!)
+    expect(has(g.state, 1, TRUCO)).toBe(false)
+    expect(applyAction(g.state, 1, TRUCO).ok).toBe(false)
+    g.plays(b[1]!)
+    expect(has(g.state, 1, TRUCO)).toBe(true)
+
+    const raised = new Game(setup([a, b])).do(0, TRUCO).do(1, QUIERO).plays(a[2]!)
+    expect(has(raised.state, 1, TRUCO)).toBe(false)
+  })
+
   it('only the player with the quiero can raise', () => {
     const g = new Game(setup([a, b])).do(0, TRUCO).do(1, QUIERO)
     expect(has(g.state, 0, TRUCO)).toBe(false)
-    g.plays(a[2]!)
+    g.plays(a[0]!)
     expect(has(g.state, 1, TRUCO)).toBe(true)
     g.do(1, TRUCO)
     expect(g.events.at(-1)).toEqual({ type: 'call', seat: 1, call: 'retruco' })
@@ -452,7 +463,7 @@ describe('truco', () => {
   })
 
   it('the turn goes back to whoever was playing', () => {
-    const g = new Game(setup([a, b])).plays(a[2]!).do(1, TRUCO).do(0, QUIERO)
+    const g = new Game(setup([a, b])).plays(a[0]!).do(1, TRUCO).do(0, QUIERO)
     expect(actorOf(g.state)).toBe(1)
   })
 })
