@@ -17,6 +17,7 @@ import { Fosforos } from '../Fosforos.tsx'
 import { playFeedback } from '../sound.ts'
 import { Table } from '../Table.tsx'
 import { cardName } from '../text.ts'
+import { scrollToSuggestion } from './scroll.ts'
 import { type Lesson, ME, type Play, type Step, playStart, sameAction } from './lesson.ts'
 
 interface Props {
@@ -75,12 +76,10 @@ export function LessonScreen({ lesson, doneCount, total, next, onFinish, onExit,
           </p>
           <Fosforos points={doneCount} target={0} big />
           <div className="lesson-actions">
-            {next && (
-              <button type="button" className="btn btn-primary" onClick={onNext}>
-                Seguir: {next.title}
-              </button>
-            )}
-            <button type="button" className={next ? 'btn' : 'btn btn-primary'} onClick={onExit}>
+            <button type="button" className="btn btn-primary" onClick={onNext}>
+              {next ? `Seguir: ${next.title}` : 'Jugar una partida con ayudante'}
+            </button>
+            <button type="button" className="btn" onClick={onExit}>
               Volver al menú
             </button>
           </div>
@@ -277,6 +276,7 @@ function PlayStep({ title, play, onDone }: { title: string; play: Play; onDone: 
   }, [state, events, reached])
 
   const current = play.cues[cue]
+  useEffect(() => scrollToSuggestion(), [cue, busy])
   const myTurn = !reached && actorOf(state) === ME
   const act = (action: Action) => {
     if (current && sameAction(action, current.expect) && game.play(action)) setCue(cue + 1)

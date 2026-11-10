@@ -1665,3 +1665,33 @@ button.card:disabled {
     outline-offset: 2px;
   }
 }
+
+.lesson-bar .back {
+  margin-right: auto;
+}
+
+.hint-toggle {
+  min-height: 40px;
+  padding: 6px 12px;
+  font-size: 14px;
+}
+
+/* Lessons and the helper add a coach line on top, so the table gets a bit smaller to fit a phone. */
+.lesson-play {
+  --card-w: 76px;
+  --card-table-w: 54px;
+  --card-back-w: 38px;
+}
+
+.lesson-play .rival {
+  min-height: 84px;
+}
+
+.lesson-play .coach {
+  min-height: 56px;
+  font-size: 15px;
+}
+
+.suggested {
+  scroll-margin: 16px;
+}

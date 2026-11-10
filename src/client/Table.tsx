@@ -31,6 +31,8 @@ interface Props {
   over?: ReactNode
   /** Lessons: only these moves can be made, and they are highlighted. */
   allow?: (action: Action) => boolean
+  /** Practice with the coach: moves to point out without restricting the others. */
+  highlight?: (action: Action) => boolean
   /** Lessons: leave out the score bar to make room. */
   hideScore?: boolean
   /** Told whenever moves start or stop playing out on screen. */
@@ -47,6 +49,7 @@ export function Table({
   rivalStatus,
   over,
   allow,
+  highlight,
   hideScore,
   onBusyChange,
 }: Props) {
@@ -205,7 +208,9 @@ export function Table({
               card={card}
               disabled={!canPlay(card)}
               onPlay={() => onAction({ type: 'play', card })}
-              suggested={!!allow && canPlay(card)}
+              suggested={
+                allow ? canPlay(card) : !!highlight?.({ type: 'play', card }) && canPlay(card)
+              }
               style={{ '--i': i } as CSSProperties}
             />
           ))}
@@ -223,7 +228,7 @@ export function Table({
               key={actionLabel(action, view)}
               type="button"
               className={
-                allow
+                allow || highlight?.(action)
                   ? 'btn suggested'
                   : action.type === 'mazo'
                     ? 'btn btn-quiet'
