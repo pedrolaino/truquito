@@ -12,7 +12,7 @@ import {
 import { CardBack, CardButton, CardView } from './Card.tsx'
 import { Fosforos } from './Fosforos.tsx'
 import { actionLabel, eventText, scoreText } from './text.ts'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { CircleHelp, Volume2, VolumeX } from 'lucide-react'
 import { GuideSheet } from './learn/GuideSheet.tsx'
 import { playSound } from './sound.ts'
@@ -29,11 +29,27 @@ interface Props {
   rivalStatus?: ReactNode
   /** Game over panel, shown once the last move has played out. */
   over?: ReactNode
+  /** Lessons: only these moves can be made, and they are highlighted. */
+  allow?: (action: Action) => boolean
+  /** Lessons: leave out the score bar to make room. */
+  hideScore?: boolean
+  /** Told whenever moves start or stop playing out on screen. */
+  onBusyChange?: (busy: boolean) => void
 }
 
 const tilt = (deg: number) => ({ '--tilt': `${deg}deg` }) as CSSProperties
 
-export function Table({ view: realView, names, events, onAction, rivalStatus, over }: Props) {
+export function Table({
+  view: realView,
+  names,
+  events,
+  onAction,
+  rivalStatus,
+  over,
+  allow,
+  hideScore,
+  onBusyChange,
+}: Props) {
   const [muted, setMuted] = useState(savedMuted)
   const [guide, setGuide] = useState(false)
   const { view, busy, announcement, shownEvents } = usePresentation(
@@ -47,7 +63,8 @@ export function Table({ view: realView, names, events, onAction, rivalStatus, ov
   const me = view.seat
   const rival = nextSeat(view, me)
   // While a move is still being shown nothing can be played.
-  const legal = busy ? [] : legalActions(view, me)
+  const legal = busy ? [] : legalActions(view, me).filter((a) => !allow || allow(a))
+  useEffect(() => onBusyChange?.(busy), [busy, onBusyChange])
   const actor = actorOf(view)
   const round = view.round
   const hand = handOf(round, me)
@@ -68,36 +85,38 @@ export function Table({ view: realView, names, events, onAction, rivalStatus, ov
 
   return (
     <section className="game" aria-label="Mesa">
-      <header className="scorebar" aria-label="Puntos">
-        {score(me, 'score-me')}
-        <button
-          type="button"
-          className="sound-toggle"
-          aria-pressed={!muted}
-          aria-label="Sonido"
-          title={muted ? 'Activar sonido' : 'Silenciar'}
-          onClick={() => {
-            setMuted(!muted)
-            saveMuted(!muted)
-          }}
-        >
-          {muted ? <VolumeX aria-hidden="true" /> : <Volume2 aria-hidden="true" />}
-        </button>
-        <button
-          type="button"
-          className="guide-toggle"
-          aria-label="Guía rápida"
-          title="Guía rápida"
-          onClick={() => setGuide(true)}
-        >
-          <CircleHelp aria-hidden="true" />
-        </button>
-        <p className="round-info">
-          <b>Ronda {view.roundNumber}</b>A {view.config.target},{' '}
-          {view.config.flor ? 'con flor' : 'sin flor'}
-        </p>
-        {score(rival, 'score-rival')}
-      </header>
+      {!hideScore && (
+        <header className="scorebar" aria-label="Puntos">
+          {score(me, 'score-me')}
+          <button
+            type="button"
+            className="sound-toggle"
+            aria-pressed={!muted}
+            aria-label="Sonido"
+            title={muted ? 'Activar sonido' : 'Silenciar'}
+            onClick={() => {
+              setMuted(!muted)
+              saveMuted(!muted)
+            }}
+          >
+            {muted ? <VolumeX aria-hidden="true" /> : <Volume2 aria-hidden="true" />}
+          </button>
+          <button
+            type="button"
+            className="guide-toggle"
+            aria-label="Guía rápida"
+            title="Guía rápida"
+            onClick={() => setGuide(true)}
+          >
+            <CircleHelp aria-hidden="true" />
+          </button>
+          <p className="round-info">
+            <b>Ronda {view.roundNumber}</b>A {view.config.target},{' '}
+            {view.config.flor ? 'con flor' : 'sin flor'}
+          </p>
+          {score(rival, 'score-rival')}
+        </header>
+      )}
 
       <div className="board">
         <div className="rival">
@@ -186,6 +205,7 @@ export function Table({ view: realView, names, events, onAction, rivalStatus, ov
               card={card}
               disabled={!canPlay(card)}
               onPlay={() => onAction({ type: 'play', card })}
+              suggested={!!allow && canPlay(card)}
               style={{ '--i': i } as CSSProperties}
             />
           ))}
@@ -203,11 +223,13 @@ export function Table({ view: realView, names, events, onAction, rivalStatus, ov
               key={actionLabel(action, view)}
               type="button"
               className={
-                action.type === 'mazo'
-                  ? 'btn btn-quiet'
-                  : action.type === 'quiero'
-                    ? 'btn btn-primary'
-                    : 'btn'
+                allow
+                  ? 'btn suggested'
+                  : action.type === 'mazo'
+                    ? 'btn btn-quiet'
+                    : action.type === 'quiero'
+                      ? 'btn btn-primary'
+                      : 'btn'
               }
               onClick={() => onAction(action)}
             >
