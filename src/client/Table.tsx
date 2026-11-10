@@ -17,6 +17,7 @@ import { CircleHelp, Volume2, VolumeX } from 'lucide-react'
 import { GuideSheet } from './learn/GuideSheet.tsx'
 import { playSound } from './sound.ts'
 import { saveMuted, savedMuted } from './storage.ts'
+import { config } from '../shared/config.ts'
 import { usePresentation } from './usePresentation.ts'
 
 interface Props {
@@ -35,6 +36,8 @@ interface Props {
   highlight?: (action: Action) => boolean
   /** Lessons: leave out the score bar to make room. */
   hideScore?: boolean
+  /** Lessons: play moves out slower so a beginner can follow them. */
+  slow?: boolean
   /** Told whenever moves start or stop playing out on screen. */
   onBusyChange?: (busy: boolean) => void
 }
@@ -51,6 +54,7 @@ export function Table({
   allow,
   highlight,
   hideScore,
+  slow,
   onBusyChange,
 }: Props) {
   const [muted, setMuted] = useState(savedMuted)
@@ -62,6 +66,7 @@ export function Table({
     (e) => {
       if (!muted) playSound(e, realView.seat)
     },
+    slow ? config.pace.lesson : 1,
   )
   const me = view.seat
   const rival = nextSeat(view, me)

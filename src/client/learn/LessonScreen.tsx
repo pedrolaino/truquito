@@ -304,6 +304,7 @@ function PlayStep({ title, play, onDone }: { title: string; play: Play; onDone: 
         onAction={act}
         allow={(a) => !!current && sameAction(a, current.expect)}
         hideScore
+        slow
         onBusyChange={onBusyChange}
         over={
           reached && (

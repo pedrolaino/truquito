@@ -21,6 +21,7 @@ export function usePresentation(
   events: GameEvent[],
   names: string[],
   onShow?: (event: GameEvent) => void,
+  slowdown = 1,
 ) {
   const [shown, setShown] = useState<Shown>(() => ({
     view,
@@ -38,7 +39,11 @@ export function usePresentation(
     if (!busy) idle.current = view
   })
 
-  const delay = shown.playing ? eventDuration(shown.playing, view.seat) : pending ? 0 : null
+  const delay = shown.playing
+    ? eventDuration(shown.playing, view.seat) * slowdown
+    : pending
+      ? 0
+      : null
 
   // Side effects of showing an event (a sound) run once per event.
   useEffect(() => {

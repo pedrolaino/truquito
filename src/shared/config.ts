@@ -20,6 +20,8 @@ export const config = {
     score: 900,
     roundEnd: 1900,
     deal: 700,
+    /** Lessons play everything this many times slower, so a beginner can follow it. */
+    lesson: 1.8,
   },
   room: {
     /** How long a disconnected player has to come back before losing. */
