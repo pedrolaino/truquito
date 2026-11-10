@@ -39,17 +39,18 @@ function handIsLost(view: GameView): boolean {
   })
 }
 
-/** Nothing in hand saves the round: leave it, or bluff a raise so the rival gives it up. */
+/** Nothing in hand saves the round: bluff a raise so the rival gives it up, or leave. */
 function lostAdvice(view: GameView, legal: Action[]): Advice | null {
-  if (!has(legal, { type: 'mazo' })) return null
   const r = view.round
-  const bluff =
-    has(legal, { type: 'truco' }) && r.truco.level < 4
-      ? ` O mentí y cantá ${RAISES[r.truco.level as 1 | 2 | 3]}: si no te lo quieren, te llevás ${r.truco.level}.`
-      : ''
+  if (has(legal, { type: 'truco' }) && r.truco.level < 4)
+    return {
+      action: { type: 'truco' },
+      why: `Mano perdida: mentí y cantá ${RAISES[r.truco.level as 1 | 2 | 3]}, si no lo quieren ganás ${r.truco.level}. O andate al mazo.`,
+    }
+  if (!has(legal, { type: 'mazo' })) return null
   return {
     action: { type: 'mazo' },
-    why: `No le ganás con ninguna: esta mano está perdida. Podés irte al mazo.${bluff}`,
+    why: 'No le ganás con ninguna: la mano está perdida. Andate al mazo.',
   }
 }
 
@@ -77,7 +78,7 @@ function cardAdvice(view: GameView): Advice {
       )
     return play(
       sorted[0]!,
-      `No le ganás: tirá el ${cardName(sorted[0]!)}, tu carta más baja, y guardá las buenas para las próximas bazas.`,
+      `No le ganás: tirá el ${cardName(sorted[0]!)}, la más baja, y guardá las buenas.`,
     )
   }
   if (r.tricks.length === 1 && sorted.length === 3)
