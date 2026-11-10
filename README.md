@@ -18,7 +18,7 @@ Argentine truco in the browser, against a bot or one on one with a friend throug
 - Each room is played with or without flor, to 15 or 30 points. At 30 the score reads as _malas_ and _buenas_.
 - The scorekeeper keeps the score of a game with real cards: tap _Nosotros_ or _Ellos_ to add a point. It draws the score with matchsticks, four in a square and a fifth across it, the way Argentine players keep score.
 - For _puntas_, a popup over the scorekeeper counts each team's points on their own; when you finish, the difference goes to the team that made more.
-- New to truco? _Aprender a jugar_ has a quick guide (the card ranking, where you can tap two cards to compare them, what each call is worth and how to count envido), eight short lessons with quizzes and hands to play, and a practice game against the easy bot where a coach suggests each move and says why. The guide is also one tap away during any game.
+- New to truco? _Aprender a jugar_ has a quick guide (the card ranking, where you can tap two cards to compare them, what each call is worth and how to count envido), nine short lessons with quizzes and hands to play, and a practice game against the easy bot where a coach suggests each move and says why. The guide is also one tap away during any game.
 - The layout is designed for phones first. You can play with a keyboard, screen readers announce every call and card, and the animations switch off when your system asks for reduced motion.
 
 ![The game table on a laptop, with the play log on the side](docs/images/desktop.png)

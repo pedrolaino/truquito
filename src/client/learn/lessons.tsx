@@ -7,10 +7,13 @@ import type { Lesson } from './lesson.ts'
 const c = (rank: Card['rank'], suit: Card['suit']): Card => ({ rank, suit })
 const play = (card: Card): Action => ({ type: 'play', card })
 const ENVIDO: Action = { type: 'envido', call: 'envido' }
+const REAL_ENVIDO: Action = { type: 'envido', call: 'realEnvido' }
 const TRUCO: Action = { type: 'truco' }
 const QUIERO: Action = { type: 'quiero' }
 const NO_QUIERO: Action = { type: 'noQuiero' }
 
+const envidoScored = (_: unknown, events: GameEvent[]) =>
+  events.some((e) => e.type === 'score' && e.reason === 'envido')
 const roundOver = (_: unknown, events: GameEvent[]) => events.some((e) => e.type === 'roundEnd')
 
 function Cards({ cards, labels }: { cards: Card[]; labels?: string[] }) {
@@ -419,7 +422,7 @@ export const LESSONS: Lesson[] = [
       {
         kind: 'say',
         title: 'Cuándo se canta',
-        text: 'En la primera baza, antes de tirar tu carta. El envido vale 2 puntos.',
+        text: 'En la primera baza, antes de tirar tu carta. Si te lo quieren, se juega por 2 puntos.',
       },
       {
         kind: 'say',
@@ -437,14 +440,95 @@ export const LESSONS: Lesson[] = [
           mano: 0,
           rival: [QUIERO],
           cues: [{ say: 'Tenés 33, lo máximo. Cantá envido.', expect: ENVIDO }],
-          goal: (_, events) => events.some((e) => e.type === 'score' && e.reason === 'envido'),
+          goal: envidoScored,
           done: 'El rival tenía menos y dijo Son buenas: sumaste 2 puntos de envido.',
         },
       },
       {
         kind: 'say',
         title: 'Subir el envido',
-        text: 'Real envido vale 3 y falta envido vale lo que le falta al que va ganando para terminar. Si se quiere, se suma todo. Si no te lo quieren, sumás 1 o lo que había antes.',
+        text: 'Si te cantan envido, en vez de contestar quiero o no quiero podés subirlo. Cada canto se suma a lo que ya había.',
+        rows: [
+          ['Envido', 'Suma 2. Se puede cantar hasta dos veces seguidas.'],
+          ['Real envido', 'Suma 3.'],
+          ['Falta envido', 'Vale lo que le falta al que va ganando para terminar la partida.'],
+        ],
+      },
+      {
+        kind: 'say',
+        title: 'Se va sumando',
+        text: 'Si al final te lo quieren, el que tiene más puntos de envido se lleva todo lo cantado.',
+        rows: [
+          ['Envido', '2 puntos'],
+          ['Envido + envido', '2 + 2 = 4 puntos'],
+          ['Envido + real envido', '2 + 3 = 5 puntos'],
+          ['Envido + envido + real envido', '2 + 2 + 3 = 7 puntos'],
+        ],
+      },
+      {
+        kind: 'play',
+        title: 'Envido, envido, real envido',
+        play: {
+          hands: [
+            [c(7, 'basto'), c(4, 'basto'), c(1, 'espada')],
+            [c(5, 'oro'), c(2, 'oro'), c(12, 'espada')],
+          ],
+          mano: 0,
+          rival: [ENVIDO, QUIERO],
+          cues: [
+            { say: 'Tenés 31 de envido. Cantá envido.', expect: ENVIDO },
+            {
+              say: 'El rival lo subió con otro envido: ya van 4. Con 31 podés subir más: cantá real envido.',
+              expect: REAL_ENVIDO,
+            },
+          ],
+          goal: envidoScored,
+          done: 'Te lo quisieron y el rival dijo Son buenas. Envido, envido y real envido: 2 + 2 + 3 = 7 puntos para vos.',
+        },
+      },
+      {
+        kind: 'say',
+        title: 'Si no te lo quieren',
+        text: 'El que cantó último se lleva lo que valía todo lo anterior a su canto. Si era el primer canto, se lleva 1.',
+        rows: [
+          ['Envido y no quiero', '1 punto'],
+          ['Envido + envido y no quiero', '2 puntos, lo que valía el primer envido'],
+          ['Envido + envido + real envido y no quiero', '4 puntos, lo que valían los dos envidos'],
+        ],
+      },
+      {
+        kind: 'play',
+        title: 'Subile el envido',
+        play: {
+          hands: [
+            [c(6, 'copa'), c(3, 'copa'), c(12, 'oro')],
+            [c(4, 'espada'), c(5, 'oro'), c(11, 'basto')],
+          ],
+          mano: 1,
+          rival: [ENVIDO, NO_QUIERO],
+          cues: [
+            {
+              say: 'El rival cantó envido y vos tenés 29. En vez de querer, subilo: cantá envido.',
+              expect: ENVIDO,
+            },
+          ],
+          goal: envidoScored,
+          done: 'No te quisieron el segundo envido: te llevás 2, lo que valía el primero.',
+        },
+      },
+      {
+        kind: 'choose',
+        prompt: 'Cantaron envido, envido y real envido, y te dicen No quiero. ¿Cuánto sumás?',
+        options: ['4', '7', '1'],
+        answer: 0,
+        explain: 'Te llevás lo que valía antes del real envido: los dos envidos, 2 + 2 = 4.',
+      },
+      {
+        kind: 'choose',
+        prompt: 'Cantaron envido y real envido, y lo quisieron. ¿Cuánto se lleva el que tiene más?',
+        options: ['5', '3', '7'],
+        answer: 0,
+        explain: 'Se suma todo lo cantado: 2 + 3 = 5.',
       },
       {
         kind: 'say',
@@ -499,6 +583,82 @@ export const LESSONS: Lesson[] = [
         kind: 'say',
         title: 'Se canta sola',
         text: 'La flor suma 3 puntos y en esa mano no hay envido. Si los dos tienen flor, gana la más alta y suma 6.',
+      },
+    ],
+  },
+  {
+    id: 'mentir',
+    title: 'Mentir',
+    summary: 'Cantar sin tener cartas',
+    steps: [
+      {
+        kind: 'say',
+        title: 'En el truco se miente',
+        text: 'Nadie ve tus cartas. Podés cantar truco aunque tengas cartas malas, para que el otro crea que tenés buenas y no te lo quiera.',
+      },
+      {
+        kind: 'say',
+        title: 'Por qué funciona',
+        text: 'Si el otro tampoco tiene buenas cartas, le conviene decir No quiero. Así te llevás la mano sin jugarla.',
+      },
+      {
+        kind: 'play',
+        title: 'Mentí con el truco',
+        play: {
+          hands: [
+            [c(4, 'copa'), c(5, 'basto'), c(6, 'oro')],
+            [c(5, 'oro'), c(6, 'espada'), c(11, 'copa')],
+          ],
+          mano: 0,
+          rival: [NO_QUIERO],
+          cues: [
+            {
+              say: 'Tus cartas son malas, pero el rival no lo sabe. Cantá truco.',
+              expect: TRUCO,
+            },
+          ],
+          goal: roundOver,
+          done: 'El rival no te lo quiso: te llevaste 1 punto con cartas malas.',
+        },
+      },
+      {
+        kind: 'say',
+        title: 'Es arriesgado',
+        text: 'Si te lo quieren, tenés que jugar la mano con esas cartas, y si perdés el otro se lleva 2 en vez de 1. Mentí de vez en cuando: si mentís siempre, te van a querer todo.',
+      },
+      {
+        kind: 'say',
+        title: 'También en el envido',
+        text: 'Si sentís que el otro tiene pocos puntos, podés cantar envido aunque vos tampoco tengas, para rascar 1 punto si no te lo quiere. Si te lo quiere y tiene más, se lleva 2.',
+      },
+      {
+        kind: 'say',
+        title: 'Cuándo conviene',
+        text: 'No hay una regla fija, pero estas pistas ayudan:',
+        rows: [
+          [
+            'Ganaste la primera',
+            'El otro tiene que ganar las dos que quedan: le cuesta más querer.',
+          ],
+          ['El otro tiró cartas bajas', 'Si tiró un 4 o un 5, capaz que no tiene nada.'],
+          ['Vas ganando por varios', 'Si te sale mal, perder 2 puntos duele menos.'],
+        ],
+      },
+      {
+        kind: 'choose',
+        prompt: 'Cantaste truco mintiendo y te dijeron Quiero. ¿Qué pasa?',
+        options: ['Se juega la mano por 2', 'Te llevás 1 punto igual', 'Se reparte de nuevo'],
+        answer: 0,
+        explain:
+          'Si te quieren la mentira, se juega por 2 y tenés que ganarla con tus cartas. Por eso es arriesgado.',
+      },
+      {
+        kind: 'choose',
+        prompt: 'Cantaste envido con 5 y te dijeron No quiero. ¿Cuánto sumás?',
+        options: ['1', '2', 'Nada'],
+        answer: 0,
+        explain:
+          'Un envido no querido vale 1, tengas lo que tengas. Y nadie se entera de tus puntos.',
       },
     ],
   },
