@@ -36,3 +36,15 @@ export const saveTally = (tally: Tally | null) =>
 
 export const savedMuted = () => read('truquito:muted') === '1'
 export const saveMuted = (muted: boolean) => write('truquito:muted', muted ? '1' : null)
+
+/** Ids of finished lessons. Unknown ids are dropped by the caller. */
+export function savedLessons(): string[] {
+  try {
+    const data: unknown = JSON.parse(read('truquito:lessons') ?? '[]')
+    return Array.isArray(data) ? data.filter((x): x is string => typeof x === 'string') : []
+  } catch {
+    return []
+  }
+}
+
+export const saveLessons = (ids: string[]) => write('truquito:lessons', JSON.stringify(ids))
