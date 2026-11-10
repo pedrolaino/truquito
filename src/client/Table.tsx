@@ -114,7 +114,7 @@ export function Table({
             <CircleHelp aria-hidden="true" />
           </button>
           <p className="round-info">
-            <b>Ronda {view.roundNumber}</b>A {view.config.target},{' '}
+            <b>Mano {view.roundNumber}</b>A {view.config.target},{' '}
             {view.config.flor ? 'con flor' : 'sin flor'}
           </p>
           {score(rival, 'score-rival')}

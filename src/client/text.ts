@@ -39,7 +39,7 @@ export function eventText(event: GameEvent, names: string[]): string | null {
   const who = (seat: number) => names[seat] ?? '?'
   switch (event.type) {
     case 'deal':
-      return `Ronda ${event.round}. Es mano ${who(event.mano)}.`
+      return `Mano ${event.round}. Es mano ${who(event.mano)}.`
     case 'play':
       return `${who(event.seat)}: ${cardName(event.card)}`
     case 'trick':
@@ -61,7 +61,7 @@ export function eventText(event: GameEvent, names: string[]): string | null {
     case 'score':
       return `${event.points} ${event.points === 1 ? 'punto' : 'puntos'} para ${who(event.seat)}`
     case 'roundEnd':
-      return `Ronda para ${who(event.winner)}`
+      return `Mano para ${who(event.winner)}`
     case 'gameEnd':
       return `Partida para ${who(event.winner)}`
   }

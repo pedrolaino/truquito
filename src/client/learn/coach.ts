@@ -34,7 +34,7 @@ function cardAdvice(view: GameView): Advice {
     if (tie && r.tricks.some((t) => t.winner === me))
       return play(
         tie,
-        `Empardá con el ${cardName(tie)}: como ya ganaste una baza, la parda te da la ronda.`,
+        `Empardá con el ${cardName(tie)}: como ya ganaste una baza, la parda te da la mano.`,
       )
     return play(
       sorted[0]!,
