@@ -1,12 +1,4 @@
-import { useState } from 'react'
-import {
-  type Card,
-  cardPower,
-  compareCards,
-  createDeck,
-  envidoPoints,
-  sameCard,
-} from '../../engine/cards.ts'
+import { type Card, cardPower, createDeck, envidoPoints } from '../../engine/cards.ts'
 import { CardView } from '../Card.tsx'
 import { cardName } from '../text.ts'
 
@@ -32,28 +24,12 @@ function levelName(cards: Card[]): string {
   return `Los ${cards[0]!.rank}`
 }
 
-export function verdict(a: Card, b: Card): string {
-  const diff = compareCards(a, b)
-  if (diff === 0) return `${cardName(a)} y ${cardName(b)} empatan: es parda`
-  const [winner, loser] = diff > 0 ? [a, b] : [b, a]
-  return `${cardName(winner)} le gana a ${cardName(loser)}`
-}
-
 function Ranking() {
-  const [picked, setPicked] = useState<Card[]>([])
-  const pick = (card: Card) =>
-    setPicked((current) => {
-      if (current.some((c) => sameCard(c, card))) return current.filter((c) => !sameCard(c, card))
-      return [...current, card].slice(-2)
-    })
-  const isPicked = (card: Card) => picked.some((c) => sameCard(c, card))
-
   return (
     <section className="guide-section" aria-labelledby="guide-ranking">
       <h2 id="guide-ranking">Qué carta gana</h2>
       <p className="guide-note">
-        De la que más mata a la que menos. Las de una misma fila empatan. Tocá dos cartas para
-        compararlas.
+        De la que más mata a la que menos. Las de una misma fila empatan.
       </p>
       <ol className="ranking">
         {LEVELS.map((cards, i) => (
@@ -64,28 +40,12 @@ function Ranking() {
             <span className="ranking-name">{levelName(cards)}</span>
             <span className="ranking-cards">
               {cards.map((card) => (
-                <button
-                  key={cardName(card)}
-                  type="button"
-                  className={isPicked(card) ? 'ranking-card picked' : 'ranking-card'}
-                  aria-pressed={isPicked(card)}
-                  aria-label={cardName(card)}
-                  onClick={() => pick(card)}
-                >
-                  <CardView card={card} />
-                </button>
+                <CardView key={cardName(card)} card={card} />
               ))}
             </span>
           </li>
         ))}
       </ol>
-      <p className="compare-bar" role="status">
-        {picked.length === 2
-          ? verdict(picked[0]!, picked[1]!)
-          : picked.length === 1
-            ? `${cardName(picked[0]!)}: tocá otra para comparar`
-            : 'Tocá dos cartas para ver cuál gana'}
-      </p>
     </section>
   )
 }
@@ -164,13 +124,13 @@ function Envido() {
   )
 }
 
-/** Quick reference: card ranking, call values and envido counting. */
+/** Quick reference: card ranking, envido counting and call values. */
 export function GuideContent() {
   return (
     <div className="guide">
       <Ranking />
-      <Calls />
       <Envido />
+      <Calls />
     </div>
   )
 }
