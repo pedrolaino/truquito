@@ -1,30 +1,34 @@
 // Score drawn the way it is kept at an Argentine table: four matches make a
-// square and the fifth crosses it. Each stick is [tail x, tail y, head x, head y];
-// the sides go clockwise from the left one, head up, so every corner gets one head.
+// square and the fifth crosses it. Each stick is [tail x, tail y, head x, head y].
+// The sides go clockwise from the left one, head up, and meet at the corners
+// with one head on each; the diagonal's head lands on the top right one.
 export const STICKS = [
-  [7, 40, 7, 8],
-  [11, 6, 40, 6],
-  [42, 10, 42, 39],
-  [38, 41, 9, 41],
-  [12, 35, 33, 14],
+  [7, 40, 7, 7],
+  [7, 7, 41, 7],
+  [41, 7, 41, 40],
+  [41, 40, 7, 40],
+  [7, 40, 41, 7],
 ] as const
 
 function Group({ count }: { count: number }) {
+  const sticks = STICKS.slice(0, count)
   return (
     <svg className="fosforo-group" viewBox="0 0 48 46" aria-hidden="true">
-      {STICKS.slice(0, count).map(([x1, y1, x2, y2], i) => (
-        <g key={i}>
-          <line
-            x1={x1}
-            y1={y1}
-            x2={x2}
-            y2={y2}
-            stroke="var(--wood)"
-            strokeWidth="4.5"
-            strokeLinecap="round"
-          />
-          <circle cx={x2} cy={y2} r="4" fill="var(--match-head)" />
-        </g>
+      {sticks.map(([x1, y1, x2, y2], i) => (
+        <line
+          key={i}
+          x1={x1}
+          y1={y1}
+          x2={x2}
+          y2={y2}
+          stroke="var(--wood)"
+          strokeWidth="4.5"
+          strokeLinecap="round"
+        />
+      ))}
+      {/* Heads go last so a stick never covers the head on its corner. */}
+      {sticks.map(([, , x, y], i) => (
+        <circle key={i} cx={x} cy={y} r="4" fill="var(--match-head)" />
       ))}
     </svg>
   )
