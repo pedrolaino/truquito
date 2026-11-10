@@ -24,3 +24,31 @@ test('keeps the score of a real game and survives a reload', async ({ page }) =>
   await page.getByRole('button', { name: 'Nueva partida' }).click()
   await expect(page.getByRole('button', { name: 'A 15' })).toBeVisible()
 })
+
+test('plays puntas apart from the score and adds only the difference', async ({ page }) => {
+  await page.goto('/anotador')
+  await page.getByRole('button', { name: 'A 30' }).click()
+  const nosotros = page.getByRole('button', { name: 'Sumar un punto a Nosotros' })
+  const ellos = page.getByRole('button', { name: 'Sumar un punto a Ellos' })
+  await nosotros.click()
+
+  await page.getByRole('button', { name: 'Jugar puntas' }).click()
+  await expect(page.getByRole('heading', { name: 'Puntas' })).toBeVisible()
+  for (let i = 0; i < 5; i++) await nosotros.click()
+  for (let i = 0; i < 7; i++) await ellos.click()
+  await expect(ellos).toContainText('7')
+
+  await page.reload()
+  await expect(page.getByRole('heading', { name: 'Puntas' })).toBeVisible()
+  await expect(nosotros).toContainText('5')
+
+  await page.getByRole('button', { name: 'Terminar puntas' }).click()
+  const dialog = page.getByRole('dialog', { name: 'Terminar puntas' })
+  await expect(dialog).toContainText('Nosotros 5, Ellos 7: +2 para Ellos')
+  await dialog.getByRole('button', { name: 'Sumar al anotador' }).click()
+
+  await expect(page.getByRole('heading', { name: 'Anotador' })).toBeVisible()
+  await expect(page.getByRole('status')).toContainText('+2 para Ellos')
+  await expect(nosotros).toContainText('1 mala')
+  await expect(ellos).toContainText('2 malas')
+})

@@ -899,6 +899,11 @@ button.card:disabled {
   --line: #4b5a73;
 }
 
+.tally.puntas .team-add {
+  border-color: var(--accent);
+  box-shadow: 5px 5px 0 var(--accent);
+}
+
 .team-minus {
   position: absolute;
   right: 14px;
