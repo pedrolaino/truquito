@@ -103,7 +103,7 @@ export interface Announcement {
   seat: number | null
 }
 
-const REASONS = { envido: 'el envido', flor: 'la flor', round: 'la ronda' } as const
+const REASONS = { envido: 'el envido', flor: 'la flor', round: 'la mano' } as const
 
 const SPOKEN = {
   envido: '¡Envido!',
@@ -158,12 +158,12 @@ export function announce(
         .map(
           (e) => `${e.seat === me ? 'Vos' : names[e.seat]} +${e.points} por ${REASONS[e.reason]}`,
         )
-      const title = event.winner === me ? 'Ganaste la ronda' : `Ronda para ${names[event.winner]}`
+      const title = event.winner === me ? 'Ganaste la mano' : `Mano para ${names[event.winner]}`
       return { text: [title, ...points].join('\n'), seat: null }
     }
     case 'deal':
       return {
-        text: `Ronda ${event.round}. ${event.mano === me ? 'Sos mano' : `Es mano ${who(event.mano)}`}`,
+        text: `Mano ${event.round}. ${event.mano === me ? 'Sos mano' : `Es mano ${who(event.mano)}`}`,
         seat: null,
       }
     case 'gameEnd':

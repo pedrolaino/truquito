@@ -99,7 +99,7 @@ describe('announcements', () => {
     const centre = shown.filter((b) => b.seat === null).map((b) => b.text)
     expect(centre).toEqual([
       'Sumás 1 punto por el envido',
-      'Ronda para Bot medio\nVos +1 por el envido\nBot medio +1 por la ronda',
+      'Mano para Bot medio\nVos +1 por el envido\nBot medio +1 por la mano',
     ])
   })
 })

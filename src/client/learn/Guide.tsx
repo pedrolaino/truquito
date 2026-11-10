@@ -122,7 +122,7 @@ function Calls() {
         </tbody>
       </table>
       <p className="guide-note">
-        Una ronda sin truco vale 1 punto. Los envidos se suman entre sí: envido y real envido
+        Una mano sin truco vale 1 punto. Los envidos se suman entre sí: envido y real envido
         queridos son 5.
       </p>
     </section>
@@ -144,7 +144,7 @@ function Envido() {
     <section className="guide-section" aria-labelledby="guide-envido">
       <h2 id="guide-envido">Cómo se cuenta el envido</h2>
       <p className="guide-note">
-        Con dos cartas del mismo palo: 20 más las dos. Las figuras (10, 11 y 12) valen 0.
+        Con dos cartas del mismo palo: 20 más las dos. Las negras (10, 11 y 12) valen 0.
       </p>
       <ul className="envido-examples">
         {ENVIDO_EXAMPLES.map(({ hand, why }) => (
