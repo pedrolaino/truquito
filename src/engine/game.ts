@@ -235,6 +235,12 @@ function canCallEnvido(round: RoundView, seat: number): boolean {
   )
 }
 
+/** Table rule: nobody calls truco on a 4. With a rival 4 on the table, truco and raises wait until you play. */
+function facingAFour(round: RoundView, seat: number): boolean {
+  const trick = round.tricks.at(-1)!
+  return trick.cards[seat] === null && trick.cards.some((c, s) => s !== seat && c?.rank === 4)
+}
+
 export function legalActions(game: Public, seat: number): Action[] {
   if (actorOf(game) !== seat) return []
   const r = game.round
@@ -246,13 +252,14 @@ export function legalActions(game: Public, seat: number): Action[] {
     actions.push({ type: 'quiero' }, { type: 'noQuiero' }, ...envidoCalls(r.envido.calls))
   } else if (r.truco.pending) {
     actions.push({ type: 'quiero' }, { type: 'noQuiero' })
-    if (r.truco.pending.level < 4) actions.push({ type: 'truco' })
+    if (r.truco.pending.level < 4 && !facingAFour(r, seat)) actions.push({ type: 'truco' })
     if (canCallEnvido(r, seat)) actions.push(...envidoCalls([]))
   } else {
     for (const card of handOf(r, seat)) actions.push({ type: 'play', card })
     if (canCallEnvido(r, seat)) actions.push(...envidoCalls([]))
     const { level, holder } = r.truco
-    if (level === 1 || (holder === seat && level < 4)) actions.push({ type: 'truco' })
+    if ((level === 1 || (holder === seat && level < 4)) && !facingAFour(r, seat))
+      actions.push({ type: 'truco' })
   }
   actions.push({ type: 'mazo' })
   return actions

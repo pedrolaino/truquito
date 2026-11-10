@@ -351,6 +351,12 @@ export const LESSONS: Lesson[] = [
         ],
       },
       {
+        kind: 'say',
+        title: 'Al 4 no se le canta truco',
+        text: 'Si el rival tiró un 4, no le podés cantar truco hasta que tires tu carta. Es una regla de la mesa, y en el juego el botón no aparece.',
+        visual: <Cards cards={[c(4, 'basto')]} labels={['Lo que tiró el rival']} />,
+      },
+      {
         kind: 'choose',
         prompt: 'Cantaste truco y te dijeron No quiero. ¿Cuántos puntos sumás?',
         options: ['1', '2', '3'],

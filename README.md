@@ -50,7 +50,7 @@ Only in rooms that play with flor. A player with three cards of the same suit si
 
 ### Truco
 
-Truco is worth 2, retruco 3 and vale cuatro 4; a round without truco is worth 1. Declined, the caller gets the previous value. Only the player who accepted the last call can raise, either while answering ("quiero retruco") or later on their turn. No cards are played while a call is waiting for an answer.
+Truco is worth 2, retruco 3 and vale cuatro 4; a round without truco is worth 1. Declined, the caller gets the previous value. Only the player who accepted the last call can raise, either while answering ("quiero retruco") or later on their turn. No cards are played while a call is waiting for an answer. Nobody calls truco on a 4: while the opponent's 4 is on the table, you cannot call or raise until you play your card.
 
 ### Irse al mazo
 

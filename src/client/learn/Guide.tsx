@@ -82,8 +82,8 @@ function Calls() {
         </tbody>
       </table>
       <p className="guide-note">
-        Una mano sin truco vale 1 punto. Los envidos se suman entre sí: envido y real envido
-        queridos son 5.
+        Una mano sin truco vale 1 punto. Al 4 no se le canta truco. Los envidos se suman entre sí:
+        envido y real envido queridos son 5.
       </p>
     </section>
   )
