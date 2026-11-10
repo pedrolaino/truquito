@@ -35,6 +35,8 @@ describe('coach', () => {
         const legal = legalActions(state, seat)
         const advice = advise(viewFor(state, seat), legal)
         expect(advice && legal.some((a) => sameAction(a, advice.action))).toBe(true)
+        // It has to fit in two lines above the hand.
+        expect(advice!.why.length).toBeLessThanOrEqual(90)
         const pick = legal[Math.floor(random() * legal.length)]!
         const result = applyAction(state, seat, pick)
         if (!result.ok) throw new Error(result.error)
@@ -113,9 +115,15 @@ describe('coach', () => {
       state = played.state
     }
     const advice = adviceFor(state)
-    expect(advice?.action).toEqual({ type: 'mazo' })
-    expect(advice?.why).toContain('perdida')
-    expect(advice?.why).toContain('mentí y cantá truco')
+    expect(advice?.action).toEqual({ type: 'truco' })
+    expect(advice?.why).toBe(
+      'Mano perdida: mentí y cantá truco, si no lo quieren ganás 1. O andate al mazo.',
+    )
+
+    state.round.truco.level = 4
+    const noBluff = adviceFor(state)
+    expect(noBluff?.action).toEqual({ type: 'mazo' })
+    expect(noBluff?.why).toContain('perdida')
   })
 
   it('plays the last card without talking about saving cards', () => {
