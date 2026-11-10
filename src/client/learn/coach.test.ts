@@ -93,4 +93,51 @@ describe('coach', () => {
     state = called.state
     expect(adviceFor(state)?.action).toEqual({ type: 'noQuiero' })
   })
+
+  it('says the hand is lost when no card can save it', () => {
+    let state = setup(
+      [
+        [c(6, 'copa'), c(11, 'espada'), c(10, 'espada')],
+        [c(2, 'oro'), c(12, 'copa'), c(4, 'basto')],
+      ],
+      1,
+    )
+    state.round.envido.status = 'closed'
+    for (const [seat, card] of [
+      [1, c(2, 'oro')],
+      [0, c(6, 'copa')],
+      [1, c(12, 'copa')],
+    ] as const) {
+      const played = applyAction(state, seat, { type: 'play', card })
+      if (!played.ok) throw new Error(played.error)
+      state = played.state
+    }
+    const advice = adviceFor(state)
+    expect(advice?.action).toEqual({ type: 'mazo' })
+    expect(advice?.why).toContain('perdida')
+    expect(advice?.why).toContain('mentí y cantá truco')
+  })
+
+  it('plays the last card without talking about saving cards', () => {
+    let state = setup([
+      [c(3, 'oro'), c(4, 'copa'), c(1, 'espada')],
+      [c(4, 'basto'), c(7, 'oro'), c(6, 'copa')],
+    ])
+    state.round.envido.status = 'closed'
+    for (const [seat, card] of [
+      [0, c(3, 'oro')],
+      [1, c(4, 'basto')],
+      [0, c(4, 'copa')],
+      [1, c(7, 'oro')],
+      [1, c(6, 'copa')],
+    ] as const) {
+      const played = applyAction(state, seat, { type: 'play', card })
+      if (!played.ok) throw new Error(played.error)
+      state = played.state
+    }
+    state.round.truco.level = 4
+    const advice = adviceFor(state)
+    expect(advice?.action).toEqual({ type: 'play', card: c(1, 'espada') })
+    expect(advice?.why).toBe('Te queda el 1 de espada: tiralo.')
+  })
 })
