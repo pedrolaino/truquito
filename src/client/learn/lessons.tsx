@@ -586,4 +586,80 @@ export const LESSONS: Lesson[] = [
       },
     ],
   },
+  {
+    id: 'mentir',
+    title: 'Mentir',
+    summary: 'Cantar sin tener cartas',
+    steps: [
+      {
+        kind: 'say',
+        title: 'En el truco se miente',
+        text: 'Nadie ve tus cartas. Podés cantar truco aunque tengas cartas malas, para que el otro crea que tenés buenas y no te lo quiera.',
+      },
+      {
+        kind: 'say',
+        title: 'Por qué funciona',
+        text: 'Si el otro tampoco tiene buenas cartas, le conviene decir No quiero. Así te llevás la mano sin jugarla.',
+      },
+      {
+        kind: 'play',
+        title: 'Mentí con el truco',
+        play: {
+          hands: [
+            [c(4, 'copa'), c(5, 'basto'), c(6, 'oro')],
+            [c(5, 'oro'), c(6, 'espada'), c(11, 'copa')],
+          ],
+          mano: 0,
+          rival: [NO_QUIERO],
+          cues: [
+            {
+              say: 'Tus cartas son malas, pero el rival no lo sabe. Cantá truco.',
+              expect: TRUCO,
+            },
+          ],
+          goal: roundOver,
+          done: 'El rival no te lo quiso: te llevaste 1 punto con cartas malas.',
+        },
+      },
+      {
+        kind: 'say',
+        title: 'Es arriesgado',
+        text: 'Si te lo quieren, tenés que jugar la mano con esas cartas, y si perdés el otro se lleva 2 en vez de 1. Mentí de vez en cuando: si mentís siempre, te van a querer todo.',
+      },
+      {
+        kind: 'say',
+        title: 'También en el envido',
+        text: 'Si sentís que el otro tiene pocos puntos, podés cantar envido aunque vos tampoco tengas, para rascar 1 punto si no te lo quiere. Si te lo quiere y tiene más, se lleva 2.',
+      },
+      {
+        kind: 'say',
+        title: 'Cuándo conviene',
+        text: 'No hay una regla fija, pero estas pistas ayudan:',
+        rows: [
+          [
+            'Ganaste la primera',
+            'El otro tiene que ganar las dos que quedan: le cuesta más querer.',
+          ],
+          ['El otro tiró cartas bajas', 'Si tiró un 4 o un 5, capaz que no tiene nada.'],
+          ['Vas ganando por varios', 'Si te sale mal, perder 2 puntos duele menos.'],
+        ],
+      },
+      {
+        kind: 'choose',
+        prompt: 'Cantaste truco mintiendo y te dijeron Quiero. ¿Qué pasa?',
+        options: ['Se juega la mano por 2', 'Te llevás 1 punto igual', 'Se reparte de nuevo'],
+        answer: 0,
+        explain:
+          'Si te quieren la mentira, se juega por 2 y tenés que ganarla con tus cartas. Por eso es arriesgado.',
+      },
+      {
+        kind: 'choose',
+        prompt: 'Cantaste envido con 5 y te dijeron No quiero. ¿Cuánto sumás?',
+        options: ['1', '2', 'Nada'],
+        answer: 0,
+        explain:
+          'Un envido no querido vale 1, tengas lo que tengas. Y nadie se entera de tus puntos.',
+      },
+    ],
+  },
 ]

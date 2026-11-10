@@ -50,7 +50,7 @@ test('a learner can go through every lesson', async ({ page }) => {
 
   await page.getByRole('button', { name: 'Volver al menú' }).click()
   await expect(page.getByText('¡Terminaste todas las lecciones!')).toBeVisible()
-  await expect(page.locator('.learn-number.is-done')).toHaveCount(8)
+  await expect(page.locator('.learn-number.is-done')).toHaveCount(9)
 })
 
 test('the helper suggests a move and the learner can follow it', async ({ page }) => {
