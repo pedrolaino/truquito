@@ -52,3 +52,20 @@ test('a learner can go through every lesson', async ({ page }) => {
   await expect(page.getByText('¡Terminaste todas las lecciones!')).toBeVisible()
   await expect(page.locator('.learn-number.is-done')).toHaveCount(8)
 })
+
+test('the helper suggests a move and the learner can follow it', async ({ page }) => {
+  await page.clock.install()
+  await page.goto('/aprender/ayudante')
+  const coach = page.locator('.coach')
+  for (let i = 0; i < 6; i++) {
+    await page.clock.fastForward(2500)
+    const suggested = page.locator('.suggested').first()
+    if (await suggested.isVisible()) {
+      await expect(coach).not.toHaveText(/Mirá lo que hace/)
+      await suggested.click({ timeout: 1000 }).catch(() => {})
+    }
+  }
+  await page.getByRole('button', { name: 'Ocultar ayuda' }).click()
+  await expect(coach).toHaveText(/La ayuda está apagada/)
+  await expect(page.locator('.suggested')).toHaveCount(0)
+})

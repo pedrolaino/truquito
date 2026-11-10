@@ -1,4 +1,4 @@
-import { BookOpen, Check, ChevronRight, House } from 'lucide-react'
+import { BookOpen, Check, ChevronRight, House, Lightbulb } from 'lucide-react'
 import { Fosforos } from '../Fosforos.tsx'
 import type { Lesson } from './lesson.ts'
 
@@ -61,6 +61,21 @@ export function LearnHub({ lessons, done, navigate }: Props) {
           })}
         </ol>
       </nav>
+
+      <button
+        type="button"
+        className={next ? 'learn-item' : 'learn-item is-next'}
+        onClick={() => navigate('/aprender/ayudante')}
+      >
+        <Lightbulb aria-hidden="true" className="learn-icon" />
+        <span className="learn-text">
+          <span className="learn-title">Partida con ayudante</span>
+          <span className="learn-sub">
+            Una partida de verdad con alguien que te sugiere qué jugar
+          </span>
+        </span>
+        <ChevronRight aria-hidden="true" />
+      </button>
 
       <button type="button" className="learn-item" onClick={() => navigate('/aprender/guia')}>
         <BookOpen aria-hidden="true" className="learn-icon" />

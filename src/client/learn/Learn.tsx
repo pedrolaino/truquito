@@ -1,6 +1,7 @@
 import { useCallback, useState } from 'react'
 import { saveLessons, savedLessons } from '../storage.ts'
 import { GuidePage } from './GuidePage.tsx'
+import { HelperGame } from './HelperGame.tsx'
 import { LearnHub } from './LearnHub.tsx'
 import { LessonScreen } from './LessonScreen.tsx'
 import { LESSONS } from './lessons.tsx'
@@ -25,6 +26,7 @@ export function Learn({ path, navigate }: { path: string; navigate: (path: strin
   }, [lesson])
 
   if (id === 'guia') return <GuidePage navigate={navigate} />
+  if (id === 'ayudante') return <HelperGame onExit={() => navigate('/aprender')} />
   if (!lesson) return <LearnHub lessons={LESSONS} done={done} navigate={navigate} />
   const next = LESSONS[index + 1] ?? null
   return (
@@ -36,7 +38,7 @@ export function Learn({ path, navigate }: { path: string; navigate: (path: strin
       next={next}
       onFinish={finish}
       onExit={() => navigate('/aprender')}
-      onNext={() => next && navigate(`/aprender/${next.id}`)}
+      onNext={() => navigate(next ? `/aprender/${next.id}` : '/aprender/ayudante')}
     />
   )
 }
