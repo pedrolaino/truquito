@@ -1,11 +1,12 @@
 // Score drawn the way it is kept at an Argentine table: four matches make a
-// square and the fifth crosses it.
-const STICKS = [
-  [6, 5, 6, 41],
-  [6, 5, 42, 5],
-  [42, 5, 42, 41],
-  [42, 41, 6, 41],
-  [9, 38, 39, 8],
+// square and the fifth crosses it. Each stick is [tail x, tail y, head x, head y];
+// the sides go clockwise from the left one, head up, so every corner gets one head.
+export const STICKS = [
+  [7, 40, 7, 8],
+  [11, 6, 40, 6],
+  [42, 10, 42, 39],
+  [38, 41, 9, 41],
+  [12, 35, 33, 14],
 ] as const
 
 function Group({ count }: { count: number }) {
