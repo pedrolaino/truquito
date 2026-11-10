@@ -26,22 +26,6 @@ function Cards({ cards, labels }: { cards: Card[]; labels?: string[] }) {
   )
 }
 
-function Sources() {
-  return (
-    <ul className="lesson-chips">
-      <li>
-        <strong>La ronda</strong> 1 punto
-      </li>
-      <li>
-        <strong>El truco</strong> 2, 3 o 4
-      </li>
-      <li>
-        <strong>El envido</strong> 2 o más
-      </li>
-    </ul>
-  )
-}
-
 export const LESSONS: Lesson[] = [
   {
     id: 'objetivo',
@@ -56,9 +40,13 @@ export const LESSONS: Lesson[] = [
       },
       {
         kind: 'say',
-        title: 'Se juega por rondas',
-        text: 'En cada ronda se reparten tres cartas a cada uno. Los puntos salen de tres lugares:',
-        visual: <Sources />,
+        title: 'Se juega por manos',
+        text: 'En cada mano se reparten tres cartas a cada uno. Los puntos salen de tres lugares:',
+        rows: [
+          ['Ganar la mano', '1 punto'],
+          ['El truco', '2, 3 o 4 puntos'],
+          ['El envido', '2 puntos o más'],
+        ],
       },
       {
         kind: 'say',
@@ -68,10 +56,10 @@ export const LESSONS: Lesson[] = [
       },
       {
         kind: 'choose',
-        prompt: '¿De dónde sale el punto de cada ronda?',
-        options: ['De ganar la ronda', 'De tener la carta más alta', 'De repartir'],
+        prompt: 'Si nadie canta nada, ¿cuánto vale ganar una mano?',
+        options: ['1 punto', '2 puntos', 'Nada'],
         answer: 0,
-        explain: 'Ganar la ronda da 1 punto. El truco y el envido son apuestas para sumar más.',
+        explain: 'Ganar la mano da 1 punto. El truco y el envido son apuestas para sumar más.',
       },
     ],
   },
@@ -122,12 +110,12 @@ export const LESSONS: Lesson[] = [
       },
       {
         kind: 'say',
-        title: 'Las figuras y las más bajas',
-        text: 'Después vienen el 12, el 11 y el 10. Abajo de todo, los sietes falsos (basto y copa), el 6, el 5 y el 4.',
+        title: 'Las negras y las más bajas',
+        text: 'Después vienen el 12, el 11 y el 10, que se llaman las negras. Abajo de todo, los sietes falsos (basto y copa), el 6, el 5 y el 4.',
         visual: (
           <Cards
             cards={[c(12, 'oro'), c(7, 'copa'), c(4, 'espada')]}
-            labels={['Figuras', 'Sietes falsos', 'El 4, la más baja']}
+            labels={['Negras', 'Sietes falsos', 'El 4, la más baja']}
           />
         ),
       },
@@ -135,7 +123,7 @@ export const LESSONS: Lesson[] = [
         kind: 'whichWins',
         a: c(7, 'copa'),
         b: c(11, 'espada'),
-        explain: 'El 7 de copa es un siete falso: vale menos que cualquier figura.',
+        explain: 'El 7 de copa es un siete falso: vale menos que cualquier negra.',
       },
       {
         kind: 'say',
@@ -158,7 +146,7 @@ export const LESSONS: Lesson[] = [
   },
   {
     id: 'ronda',
-    title: 'La ronda',
+    title: 'La mano',
     summary: 'Las tres bazas y quién empieza',
     steps: [
       {
@@ -169,17 +157,17 @@ export const LESSONS: Lesson[] = [
       },
       {
         kind: 'say',
-        title: 'Dos bazas ganan la ronda',
-        text: 'Si ganás la primera y la segunda, la ronda es tuya y no hace falta jugar la tercera.',
+        title: 'Dos bazas ganan la mano',
+        text: 'Si ganás la primera y la segunda, la mano es tuya y no hace falta jugar la tercera.',
       },
       {
         kind: 'say',
         title: 'Quién empieza',
-        text: 'El que es mano tira primero. Después de cada baza empieza el que la ganó. La mano se turna ronda a ronda.',
+        text: 'El que es mano tira primero. Después de cada baza empieza el que la ganó. En la mano siguiente, el mano es el otro.',
       },
       {
         kind: 'play',
-        title: 'Jugá una ronda',
+        title: 'Jugá una mano',
         play: {
           hands: [
             [c(1, 'espada'), c(3, 'copa'), c(5, 'oro')],
@@ -195,13 +183,13 @@ export const LESSONS: Lesson[] = [
             },
           ],
           goal: roundOver,
-          done: 'Ganaste la primera y la segunda: la ronda es tuya y sumás 1 punto.',
+          done: 'Ganaste la primera y la segunda: la mano es tuya y sumás 1 punto.',
         },
       },
       {
         kind: 'say',
         title: 'Guardá las buenas',
-        text: 'Si no podés ganar una baza, tirá tu carta más baja y guardá las fuertes para después.',
+        text: 'Si en la primera no podés ganarle, tirá tu carta más baja y guardá las fuertes para la segunda y la tercera.',
       },
       {
         kind: 'play',
@@ -225,7 +213,7 @@ export const LESSONS: Lesson[] = [
             },
           ],
           goal: roundOver,
-          done: 'Perdiste la primera pero ganaste las otras dos. Guardar el 7 de oro te dio la ronda.',
+          done: 'Perdiste la primera pero ganaste las otras dos. Guardar el 7 de oro te dio la mano.',
         },
       },
     ],
@@ -244,7 +232,7 @@ export const LESSONS: Lesson[] = [
       {
         kind: 'say',
         title: 'Parda la primera',
-        text: 'Si la primera es parda, el que gana la segunda se lleva la ronda.',
+        text: 'Si la primera es parda, el que gana la segunda se lleva la mano.',
       },
       {
         kind: 'play',
@@ -259,42 +247,47 @@ export const LESSONS: Lesson[] = [
           cues: [
             { say: 'Sos mano. Tirá el 3 de copa.', expect: play(c(3, 'copa')) },
             {
-              say: 'Parda la primera: la segunda define la ronda. Empezás vos por ser mano. Tirá el 7 de espada.',
+              say: 'Parda la primera: la segunda define la mano. Empezás vos por ser mano. Tirá el 7 de espada.',
               expect: play(c(7, 'espada')),
             },
           ],
           goal: roundOver,
-          done: 'Con la primera parda, ganar la segunda te dio la ronda.',
+          done: 'Con la primera parda, ganar la segunda te dio la mano.',
         },
       },
       {
         kind: 'say',
         title: 'Parda después',
-        text: 'Si alguien ya ganó la primera y después hay parda, la ronda es de quien ganó la primera. Si las tres son pardas, gana el mano.',
+        text: 'Si alguien ya ganó la primera y después hay parda, la mano es de quien ganó la primera. Si las tres son pardas, gana el mano.',
       },
       {
         kind: 'choose',
         prompt: 'Ganaste la primera y la segunda es parda. ¿Qué pasa?',
-        options: ['La ronda es tuya', 'Se juega la tercera', 'Gana el mano'],
+        options: ['La mano es tuya', 'Se juega la tercera', 'Gana el mano'],
         answer: 0,
-        explain: 'El que ganó la primera se lleva la ronda si después hay parda.',
+        explain: 'El que ganó la primera se lleva la mano si después hay parda.',
       },
     ],
   },
   {
     id: 'truco',
     title: 'El truco',
-    summary: 'Cómo apostar más por la ronda',
+    summary: 'Cómo apostar más por la mano',
     steps: [
       {
         kind: 'say',
         title: 'Cantar truco',
-        text: 'En tu turno, antes de tirar, podés cantar truco. Si te lo quieren, la ronda pasa a valer 2 puntos.',
+        text: 'En tu turno, antes de tirar, podés cantar truco. Si te lo quieren, la mano pasa a valer 2 puntos.',
       },
       {
         kind: 'say',
         title: 'Las respuestas',
-        text: 'Quiero: se juega por 2. No quiero: el que cantó se lleva 1 y la ronda termina. Quiero retruco: sube a 3.',
+        text: 'Cuando te cantan truco, tenés tres respuestas:',
+        rows: [
+          ['Quiero', 'Se juega la mano por 2 puntos.'],
+          ['No quiero', 'El que cantó se lleva 1 punto y la mano termina.'],
+          ['Quiero retruco', 'Aceptás y subís la apuesta a 3.'],
+        ],
       },
       {
         kind: 'play',
@@ -309,13 +302,13 @@ export const LESSONS: Lesson[] = [
           cues: [
             { say: 'Tenés los dos anchos. Cantá truco.', expect: TRUCO },
             {
-              say: 'Te lo quisieron: la ronda vale 2. Tirá el ancho de espada.',
+              say: 'Te lo quisieron: la mano vale 2. Tirá el ancho de espada.',
               expect: play(c(1, 'espada')),
             },
-            { say: 'Tirá el ancho de basto y llevate la ronda.', expect: play(c(1, 'basto')) },
+            { say: 'Tirá el ancho de basto y llevate la mano.', expect: play(c(1, 'basto')) },
           ],
           goal: roundOver,
-          done: 'Ganaste la ronda con el truco querido: sumaste 2 puntos.',
+          done: 'Ganaste la mano con el truco querido: sumaste 2 puntos.',
         },
       },
       {
@@ -346,14 +339,20 @@ export const LESSONS: Lesson[] = [
       {
         kind: 'say',
         title: 'Retruco, vale cuatro y el mazo',
-        text: 'Después del truco viene el retruco (3) y el vale cuatro (4). Solo sube el que dijo quiero. En tu turno también podés irte al mazo y dejar la ronda.',
+        text: 'La apuesta puede subir dos veces más. Solo sube el que dijo quiero.',
+        rows: [
+          ['Truco', 'La mano vale 2.'],
+          ['Retruco', 'La mano vale 3.'],
+          ['Vale cuatro', 'La mano vale 4.'],
+          ['Me voy al mazo', 'En tu turno podés dejar la mano. El otro se lleva lo que valía.'],
+        ],
       },
       {
         kind: 'choose',
         prompt: 'Cantaste truco y te dijeron No quiero. ¿Cuántos puntos sumás?',
         options: ['1', '2', '3'],
         answer: 0,
-        explain: 'Si no te quieren el truco, sumás lo que valía la ronda antes: 1 punto.',
+        explain: 'Si no te quieren el truco, sumás lo que valía la mano antes: 1 punto.',
       },
     ],
   },
@@ -365,7 +364,7 @@ export const LESSONS: Lesson[] = [
       {
         kind: 'say',
         title: 'Una apuesta aparte',
-        text: 'El envido se juega al principio de la ronda y gana el que tiene más puntos de envido en sus cartas.',
+        text: 'El envido se juega al principio de la mano y gana el que tiene más puntos de envido en sus cartas.',
       },
       {
         kind: 'say',
@@ -375,14 +374,14 @@ export const LESSONS: Lesson[] = [
       },
       {
         kind: 'say',
-        title: 'Las figuras valen 0',
-        text: 'El 10, el 11 y el 12 no suman. Acá: 20 + 0 + 6 = 26.',
+        title: 'Las negras valen 0',
+        text: 'Al 10, al 11 y al 12 se les dice las negras, y para el envido no suman. Acá: 20 + 0 + 6 = 26.',
         visual: <Cards cards={[c(12, 'espada'), c(6, 'espada')]} />,
       },
       {
         kind: 'say',
         title: 'Sin dos del mismo palo',
-        text: 'Vale la carta más alta. Acá: 7.',
+        text: 'Vale tu carta más alta, pero las negras siguen valiendo 0. Acá el 11 no cuenta y tenés 7.',
         visual: <Cards cards={[c(4, 'basto'), c(7, 'copa'), c(11, 'oro')]} />,
       },
       {
@@ -395,13 +394,14 @@ export const LESSONS: Lesson[] = [
         kind: 'count',
         hand: [c(10, 'oro'), c(4, 'oro'), c(7, 'basto')],
         options: [24, 7, 14],
-        explain: 'El 10 y el 4 son de oro, y el 10 vale 0: 20 + 0 + 4 = 24.',
+        explain: 'El 10 y el 4 son de oro, y el 10 es negra: vale 0. 20 + 0 + 4 = 24.',
       },
       {
         kind: 'count',
         hand: [c(2, 'espada'), c(5, 'basto'), c(12, 'copa')],
         options: [25, 12, 5],
-        explain: 'No hay dos del mismo palo: vale la más alta, el 5.',
+        explain:
+          'No hay dos del mismo palo: vale la más alta para el envido, el 5. Acordate que el 12 es negra y vale 0.',
       },
       {
         kind: 'count',
@@ -472,7 +472,7 @@ export const LESSONS: Lesson[] = [
             },
           ],
           goal: (state) => state.round.truco.level === 2,
-          done: 'Sumaste el envido y aceptaste el truco: la ronda sigue valiendo 2.',
+          done: 'Sumaste el envido y aceptaste el truco: la mano vale 2.',
         },
       },
       {
@@ -498,7 +498,7 @@ export const LESSONS: Lesson[] = [
       {
         kind: 'say',
         title: 'Se canta sola',
-        text: 'La flor suma 3 puntos y esa ronda no hay envido. Si los dos tienen flor, gana la más alta y suma 6.',
+        text: 'La flor suma 3 puntos y en esa mano no hay envido. Si los dos tienen flor, gana la más alta y suma 6.',
       },
     ],
   },

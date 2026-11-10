@@ -35,7 +35,14 @@ export interface Play {
 }
 
 export type Step =
-  | { kind: 'say'; title: string; text: string; visual?: ReactNode }
+  | {
+      kind: 'say'
+      title: string
+      text: string
+      visual?: ReactNode
+      /** Short items shown under the text, one per row: a name and what it means. */
+      rows?: [string, string][]
+    }
   | { kind: 'whichWins'; a: Card; b: Card; explain: string }
   | { kind: 'count'; hand: Card[]; options: number[]; explain: string }
   | { kind: 'choose'; prompt: string; options: string[]; answer: number; explain: string }

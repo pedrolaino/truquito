@@ -104,6 +104,16 @@ function StepView({ step, first, onDone }: { step: Step; first: boolean; onDone:
           {step.visual && <div className="lesson-visual">{step.visual}</div>}
           <h1 id="step-title">{step.title}</h1>
           <p className="lesson-text">{step.text}</p>
+          {step.rows && (
+            <dl className="lesson-rows">
+              {step.rows.map(([name, meaning]) => (
+                <div key={name}>
+                  <dt>{name}</dt>
+                  <dd>{meaning}</dd>
+                </div>
+              ))}
+            </dl>
+          )}
           <div className="lesson-actions">
             <button type="button" className="btn btn-primary" onClick={onDone} autoFocus>
               {first ? 'Empezar' : 'Seguir'}
