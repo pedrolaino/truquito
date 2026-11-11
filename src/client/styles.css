@@ -738,6 +738,13 @@ button.card:disabled {
   font-size: 14px;
 }
 
+.calls .btn-blocked {
+  border-style: dashed;
+  box-shadow: none;
+  font-size: 13px;
+  line-height: 1.15;
+}
+
 .log {
   display: none;
 }
@@ -1170,6 +1177,32 @@ button.card:disabled {
 
 .guide-note {
   color: var(--muted);
+}
+
+.guide-nav {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  display: flex;
+  gap: 8px;
+  padding: 6px 0;
+  background: var(--paper);
+}
+
+.guide-nav .btn {
+  min-height: 40px;
+  padding: 4px 14px;
+  font-size: 15px;
+}
+
+.guide-section h2 {
+  scroll-margin-top: 60px;
+}
+
+.guide-rule {
+  padding: 10px 14px;
+  border-left: 4px solid var(--accent);
+  background: var(--card);
 }
 
 .ranking {

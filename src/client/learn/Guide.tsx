@@ -1,3 +1,4 @@
+import { useEffect, useRef } from 'react'
 import { type Card, cardPower, createDeck, envidoPoints } from '../../engine/cards.ts'
 import { CardView } from '../Card.tsx'
 import { cardName } from '../text.ts'
@@ -26,8 +27,8 @@ function levelName(cards: Card[]): string {
 
 function Ranking() {
   return (
-    <section className="guide-section" aria-labelledby="guide-ranking">
-      <h2 id="guide-ranking">Qué carta gana</h2>
+    <section className="guide-section" aria-labelledby="guide-cartas">
+      <h2 id="guide-cartas">Qué carta gana</h2>
       <p className="guide-note">
         De la que más mata a la que menos. Las de una misma fila empatan.
       </p>
@@ -61,8 +62,8 @@ const CALLS: [string, string, string][] = [
 
 function Calls() {
   return (
-    <section className="guide-section" aria-labelledby="guide-calls">
-      <h2 id="guide-calls">Cuánto vale cada canto</h2>
+    <section className="guide-section" aria-labelledby="guide-cantos">
+      <h2 id="guide-cantos">Cuánto vale cada canto</h2>
       <table className="calls-table">
         <thead>
           <tr>
@@ -82,8 +83,16 @@ function Calls() {
         </tbody>
       </table>
       <p className="guide-note">
-        Una mano sin truco vale 1 punto. Al 4 no se le canta truco. Los envidos se suman entre sí:
-        envido y real envido queridos son 5.
+        Una mano sin truco vale 1 punto. Los envidos se suman entre sí: envido y real envido
+        queridos son 5.
+      </p>
+      <p className="guide-note">
+        La falta envido no se suma a lo cantado antes: vale lo que le falta al que va ganando. A 15,
+        con 12 a 8, vale 3.
+      </p>
+      <p className="guide-rule">
+        <strong>Regla de esta mesa:</strong> al 4 no se le canta truco. Si el rival tiró un 4, el
+        truco espera hasta que tires tu carta.
       </p>
     </section>
   )
@@ -97,6 +106,12 @@ const ENVIDO_EXAMPLES: { hand: Card[]; why: string }[] = [
     hand: [c(4, 'basto'), c(7, 'copa'), c(11, 'oro')],
     why: 'Ninguna del mismo palo: vale la más alta',
   },
+  {
+    hand: [c(7, 'copa'), c(5, 'copa'), c(2, 'copa')],
+    why: 'Tres del mismo palo, sin flor: las dos mejores',
+  },
+  { hand: [c(12, 'oro'), c(11, 'oro'), c(4, 'basto')], why: 'Dos negras del mismo palo: 20' },
+  { hand: [c(10, 'espada'), c(11, 'copa'), c(12, 'basto')], why: 'Tres negras: 0' },
 ]
 
 function Envido() {
@@ -104,7 +119,8 @@ function Envido() {
     <section className="guide-section" aria-labelledby="guide-envido">
       <h2 id="guide-envido">Cómo se cuenta el envido</h2>
       <p className="guide-note">
-        Con dos cartas del mismo palo: 20 más las dos. Las negras (10, 11 y 12) valen 0.
+        Con dos cartas del mismo palo: 20 más las dos. Las negras (10, 11 y 12) valen 0. Si los dos
+        tienen lo mismo, gana el mano.
       </p>
       <ul className="envido-examples">
         {ENVIDO_EXAMPLES.map(({ hand, why }) => (
@@ -124,10 +140,34 @@ function Envido() {
   )
 }
 
-/** Quick reference: card ranking, envido counting and call values. */
-export function GuideContent() {
+export type GuideSection = 'cartas' | 'envido' | 'cantos'
+
+const SECTIONS: [GuideSection, string][] = [
+  ['cartas', 'Cartas'],
+  ['envido', 'Envido'],
+  ['cantos', 'Cantos'],
+]
+
+/** Quick reference: card ranking, envido counting and call values. Opens at `section`. */
+export function GuideContent({ section }: { section?: GuideSection }) {
+  const root = useRef<HTMLDivElement>(null)
+  const go = (id: GuideSection, smooth = true) =>
+    root.current
+      ?.querySelector(`#guide-${id}`)
+      ?.scrollIntoView({ block: 'start', behavior: smooth ? 'smooth' : 'auto' })
+  useEffect(() => {
+    if (section) go(section, false)
+  }, [section])
+
   return (
-    <div className="guide">
+    <div className="guide" ref={root}>
+      <nav className="guide-nav" aria-label="Secciones de la guía">
+        {SECTIONS.map(([id, label]) => (
+          <button key={id} type="button" className="btn btn-quiet" onClick={() => go(id)}>
+            {label}
+          </button>
+        ))}
+      </nav>
       <Ranking />
       <Envido />
       <Calls />
