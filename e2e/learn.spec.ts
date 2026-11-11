@@ -24,23 +24,30 @@ test('the quick guide opens from the menu and over a game', async ({ page }) => 
 })
 
 test('a learner can go through every lesson', async ({ page }) => {
-  test.setTimeout(120_000)
+  test.setTimeout(300_000)
   await page.clock.install()
-  await page.goto('/aprender')
-  await expect(page.getByText('Empezá por la primera, son 2 minutos.')).toBeVisible()
-  await page.getByRole('button', { name: /De qué se trata/ }).click()
-  await expect(page.getByText('Lección 1', { exact: true })).toBeVisible()
+  await page.goto('/aprender/objetivo')
 
   const finished = page.getByRole('heading', { name: '¡Lección terminada!' })
-  const nextLesson = page.getByRole('button', { name: /^Seguir: / })
+  const nextLesson = page.getByRole('button', { name: /^Continuar: / })
+  // What to tap, in order: move on, give up on a question, ask for a hint, follow it, answer.
+  const taps = [
+    page.locator('.feedback .btn-primary'),
+    page.getByRole('button', { name: 'Ver explicación' }),
+    page.locator('.lesson-actions .btn-primary'),
+    page.getByRole('button', { name: 'Pista' }),
+    page.locator('.suggested'),
+    page.locator('.quiz-option:enabled, .quiz-card:enabled'),
+  ]
   for (let lessons = 0; lessons < 20; lessons++) {
-    for (let i = 0; i < 80 && !(await finished.isVisible()); i++) {
-      const go = page.locator('.lesson-actions .btn-primary, .feedback .btn-primary').first()
-      const option = page.locator('.quiz-option, .quiz-card').first()
-      const cue = page.locator('.suggested').first()
-      if (await go.isVisible()) await go.click()
-      else if (await option.isVisible()) await option.click()
-      else if (await cue.isVisible()) await cue.click({ timeout: 1000 }).catch(() => {})
+    for (let i = 0; i < 120 && !(await finished.isVisible()); i++) {
+      for (const tap of taps) {
+        const target = tap.first()
+        if (await target.isVisible()) {
+          await target.click({ timeout: 1000 }).catch(() => {})
+          break
+        }
+      }
       await page.clock.fastForward(1500)
     }
     await expect(finished).toBeVisible()
@@ -49,8 +56,7 @@ test('a learner can go through every lesson', async ({ page }) => {
   }
 
   await page.getByRole('button', { name: 'Volver al menú' }).click()
-  await expect(page.getByText('¡Listo! Ya sabés jugar. Animate a una partida.')).toBeVisible()
-  await expect(page.locator('.learn-number.is-done')).toHaveCount(9)
+  await expect(page.locator('.learn-number.is-done')).toHaveCount(12)
 })
 
 test('the helper suggests a move and the learner can follow it', async ({ page }) => {

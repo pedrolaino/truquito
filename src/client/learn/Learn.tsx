@@ -39,17 +39,19 @@ export function Learn({ path, navigate }: { path: string; navigate: (path: strin
       <LearnHub lessons={LESSONS} done={done} lastTime={savedLessonTime()} navigate={navigate} />
     )
   const next = LESSONS[index + 1] ?? null
+  const required = LESSONS.filter((l) => !l.optional)
+  const doneRequired = required.filter((l) => done.has(l.id) || l === lesson).length
   return (
     <LessonScreen
       key={lesson.id}
       lesson={lesson}
-      number={index + 1}
-      doneCount={done.size + (done.has(lesson.id) ? 0 : 1)}
-      total={LESSONS.length}
+      doneCount={doneRequired}
+      total={required.length}
       next={next}
       onFinish={finish}
       onExit={() => navigate('/aprender')}
-      onNext={() => navigate(next ? `/aprender/${next.id}` : '/aprender/ayudante')}
+      onNext={() => next && navigate(`/aprender/${next.id}`)}
+      onHelper={() => navigate('/aprender/ayudante')}
     />
   )
 }
