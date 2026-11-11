@@ -1085,41 +1085,6 @@ button.card:disabled {
   gap: 12px;
 }
 
-.learn-item {
-  font: inherit;
-  color: var(--ink);
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  width: 100%;
-  padding: 14px 16px;
-  min-height: 72px;
-  border: var(--border) solid var(--ink);
-  border-radius: var(--radius);
-  background: var(--card);
-  box-shadow: 4px 4px 0 var(--ink);
-  text-align: left;
-  cursor: pointer;
-  transition:
-    transform 120ms var(--ease-out),
-    box-shadow 120ms var(--ease-out);
-}
-
-.learn-item:active {
-  transform: translate(2px, 2px);
-  box-shadow: 2px 2px 0 var(--ink);
-}
-
-.learn-item > svg {
-  width: 22px;
-  height: 22px;
-  flex: none;
-}
-
-.learn-icon {
-  color: var(--accent);
-}
-
 .learn-text {
   flex: 1;
   display: flex;
@@ -1368,34 +1333,6 @@ button.card:disabled {
   font-weight: 700;
 }
 
-.learn-number {
-  width: 36px;
-  height: 36px;
-  flex: none;
-  display: grid;
-  place-items: center;
-  border-radius: 50%;
-  border: var(--border) solid var(--ink);
-  font-family: var(--font-display);
-  font-weight: 800;
-}
-
-.learn-number.is-done {
-  background: var(--ok);
-  border-color: var(--ok);
-  color: #fff;
-}
-
-.learn-number svg {
-  width: 20px;
-  height: 20px;
-}
-
-.learn-item.is-next {
-  border-color: var(--accent);
-  box-shadow: 4px 4px 0 var(--accent);
-}
-
 /* ---------- Lessons ---------- */
 
 .lesson {
@@ -1450,16 +1387,6 @@ button.card:disabled {
   line-height: 1.5;
 }
 
-.coach p {
-  margin: 0;
-}
-
-.coach small {
-  font-size: 13px;
-  font-weight: 500;
-  opacity: 0.75;
-}
-
 .lesson-hint {
   margin: 0;
   font-size: 15px;
@@ -1468,32 +1395,6 @@ button.card:disabled {
 
 .praise {
   font-weight: 800;
-}
-
-.lesson-hook {
-  justify-content: center;
-}
-
-.lesson-hook h1 {
-  font-size: 38px;
-  line-height: 1.05;
-}
-
-.lesson-kicker {
-  margin: 0;
-  font-size: 14px;
-  font-weight: 800;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--accent);
-}
-
-.lesson-hook .lesson-text {
-  font-size: 21px;
-}
-
-.lesson-hook .lesson-actions {
-  margin-top: 24px;
 }
 
 .lesson-visual {
@@ -1549,11 +1450,9 @@ button.card:disabled {
 }
 
 .lesson-rows div {
-  padding: 12px 16px;
-  border: var(--border) solid var(--ink);
-  border-radius: var(--radius);
-  background: var(--card);
-  box-shadow: 3px 3px 0 var(--ink);
+  padding: 10px 14px;
+  border-left: 4px solid var(--line);
+  background: color-mix(in srgb, var(--card) 70%, transparent);
 }
 
 .lesson-rows dt {
@@ -1662,21 +1561,6 @@ button.card:disabled {
   flex: 1;
   display: flex;
   flex-direction: column;
-}
-
-.coach {
-  margin: 0 var(--gutter);
-  min-height: 66px;
-  padding: 10px 14px;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  gap: 2px;
-  border-radius: var(--radius);
-  background: var(--ink);
-  color: var(--card);
-  font-weight: 700;
-  line-height: 1.35;
 }
 
 .lesson-play .game {
@@ -1928,11 +1812,345 @@ button.card:disabled {
   justify-content: center;
 }
 
-.lesson-play .coach {
+.suggested {
+  scroll-margin: 16px;
+}
+
+/* ---------- Learning path ---------- */
+
+.learn-entry {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.learn-start {
   min-height: 56px;
+  font-size: 18px;
+}
+
+.learn-more {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.learn-more .btn {
+  flex: 1 1 160px;
   font-size: 15px;
 }
 
-.suggested {
-  scroll-margin: 16px;
+.learn-path {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.learn-stage h2 {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 6px;
+  font-size: 17px;
+  font-weight: 800;
+}
+
+.learn-stage h2 span {
+  width: 26px;
+  height: 26px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--ink);
+  color: var(--card);
+  font-size: 14px;
+}
+
+.learn-stage .learn-list {
+  gap: 2px;
+}
+
+.learn-row {
+  font: inherit;
+  color: var(--ink);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  min-height: 56px;
+  padding: 8px 10px;
+  border: 0;
+  border-radius: var(--radius);
+  background: none;
+  text-align: left;
+  cursor: pointer;
+}
+
+.learn-row:hover {
+  background: color-mix(in srgb, var(--line) 30%, transparent);
+}
+
+.learn-row > svg {
+  width: 20px;
+  height: 20px;
+  flex: none;
+  color: var(--muted);
+}
+
+.learn-row .learn-title {
+  font-size: 17px;
+}
+
+.learn-row.is-next {
+  border: var(--border) solid var(--accent);
+  background: var(--card);
+  box-shadow: 3px 3px 0 var(--accent);
+}
+
+.learn-mark {
+  width: 22px;
+  height: 22px;
+  flex: none;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  border: 2px solid var(--line);
+}
+
+.learn-mark.is-done {
+  background: var(--ok);
+  border-color: var(--ok);
+  color: #fff;
+}
+
+.learn-mark svg {
+  width: 14px;
+  height: 14px;
+}
+
+/* ---------- Lesson activities ---------- */
+
+.lesson-more {
+  font-size: 16px;
+}
+
+.lesson-more summary {
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.lesson-more p {
+  margin: 6px 0 0;
+  color: var(--muted);
+}
+
+.quiz-card,
+.quiz-option {
+  position: relative;
+}
+
+.mark {
+  position: absolute;
+  top: -10px;
+  right: -10px;
+  width: 28px;
+  height: 28px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  color: #fff;
+}
+
+.mark svg {
+  width: 18px;
+  height: 18px;
+}
+
+.mark-right {
+  background: var(--ok);
+}
+
+.mark-wrong {
+  background: var(--accent);
+}
+
+.feedback strong {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.feedback strong svg {
+  width: 22px;
+  height: 22px;
+}
+
+.feedback .btn:not(.btn-primary) {
+  align-self: flex-start;
+}
+
+.order-slots {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+}
+
+.order-slot {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  font-weight: 800;
+}
+
+.order-slot .card,
+.order-empty {
+  --card-w: 72px;
+}
+
+.order-empty {
+  width: var(--card-w);
+  aspect-ratio: 2 / 3;
+  border: 2px dashed var(--line);
+  border-radius: 10px;
+}
+
+.order-slot.is-filled .card {
+  animation: pop 260ms var(--ease-out) both;
+}
+
+.order-left {
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.order-left .card,
+.pick-cards .card {
+  --card-w: 88px;
+}
+
+.quiz-card.is-picked {
+  outline: 4px solid var(--ink);
+  outline-offset: 4px;
+  transform: translateY(-8px);
+}
+
+.lesson-cards > .counts .card {
+  transform: translateY(-10px);
+  outline: 4px solid var(--ok);
+  outline-offset: 3px;
+  transition: transform 300ms var(--ease-out);
+}
+
+.lesson-cards > .faded {
+  opacity: 0.35;
+  transition: opacity 300ms;
+}
+
+.lesson-tricks {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  justify-content: center;
+  gap: 18px;
+}
+
+.lesson-tricks li {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+.lesson-tricks .card {
+  --card-w: 52px;
+}
+
+.lesson-tricks .lesson-card {
+  gap: 2px;
+}
+
+.lesson-tricks-name {
+  font-weight: 800;
+}
+
+.chain {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 17px;
+}
+
+.chain li {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 8px;
+  padding: 8px 12px;
+  border-left: 4px solid var(--line);
+}
+
+.chain-value {
+  margin-left: auto;
+  color: var(--muted);
+}
+
+.chain li.is-last {
+  border-left-color: var(--accent);
+  background: var(--card);
+  font-weight: 700;
+}
+
+.chain li.is-last .chain-value {
+  color: var(--accent);
+}
+
+/* The result of a lesson hand sits low, so the tricks that explain it stay in sight. */
+.overlay-result {
+  background: none;
+  pointer-events: none;
+}
+
+.overlay-result .panel {
+  pointer-events: auto;
+  width: min(100%, 520px);
+  box-shadow: var(--shadow);
+}
+
+.result-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.result-actions .btn {
+  flex: 1 1 140px;
+}
+
+.tip-hint {
+  display: block;
+  margin-top: 2px;
+  font-size: 13px;
+  font-weight: 500;
+  opacity: 0.8;
+}
+
+.done-progress {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 700;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lesson-cards > .counts .card,
+  .quiz-card.is-picked {
+    transform: none;
+  }
 }
