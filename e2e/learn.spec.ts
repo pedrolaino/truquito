@@ -65,10 +65,7 @@ test('the helper suggests a move and the learner can follow it', async ({ page }
       await suggested.click({ timeout: 1000 }).catch(() => {})
     }
   }
-  const toggle = page.getByRole('button', { name: 'Ayuda' })
-  await expect(toggle).toHaveAttribute('aria-pressed', 'true')
-  await toggle.click()
-  await expect(toggle).toHaveAttribute('aria-pressed', 'false')
+  await page.getByRole('combobox', { name: 'Ayuda' }).selectOption('off')
   await expect(coach).toHaveCount(0)
   await expect(page.locator('.suggested')).toHaveCount(0)
 })

@@ -10,7 +10,7 @@ import {
   startRound,
   viewFor,
 } from '../../engine/game.ts'
-import { advise } from './coach.ts'
+import { advise, envidoStakes, reviewRound } from './coach.ts'
 import { sameAction } from './lesson.ts'
 
 const c = (rank: Card['rank'], suit: Card['suit']): Card => ({ rank, suit })
@@ -36,6 +36,7 @@ describe('coach', () => {
         const advice = advise(viewFor(state, seat), legal)
         expect(advice && legal.some((a) => sameAction(a, advice.action))).toBe(true)
         // It has to fit in two lines above the hand.
+        expect(advice!.say.length).toBeLessThanOrEqual(40)
         expect(advice!.why.length).toBeLessThanOrEqual(90)
         const pick = legal[Math.floor(random() * legal.length)]!
         const result = applyAction(state, seat, pick)
@@ -116,9 +117,8 @@ describe('coach', () => {
     }
     const advice = adviceFor(state)
     expect(advice?.action).toEqual({ type: 'truco' })
-    expect(advice?.why).toBe(
-      'Mano perdida: mentí y cantá truco, si no lo quieren ganás 1. O andate al mazo.',
-    )
+    expect(advice?.say).toBe('Mentí: cantá truco.')
+    expect(advice?.why).toContain('Si no lo quieren, sumás 1')
 
     state.round.truco.level = 4
     const noBluff = adviceFor(state)
@@ -146,6 +146,95 @@ describe('coach', () => {
     state.round.truco.level = 4
     const advice = adviceFor(state)
     expect(advice?.action).toEqual({ type: 'play', card: c(1, 'espada') })
-    expect(advice?.why).toBe('Te queda el 1 de espada: tiralo.')
+    expect(advice?.say).toBe('Tirá el 1 de espada.')
+    expect(advice?.why).toBe('Es tu última carta.')
+  })
+
+  it('weighs an envido by what is at stake, not by a fixed number', () => {
+    let state = setup([
+      [c(7, 'oro'), c(1, 'oro'), c(4, 'copa')],
+      [c(4, 'basto'), c(5, 'copa'), c(6, 'espada')],
+    ])
+    const called = applyAction(state, 0, { type: 'envido', call: 'envido' })
+    if (!called.ok) throw new Error(called.error)
+    state = called.state
+    expect(adviceFor(state, 1)?.action.type).toBe('noQuiero')
+    expect(envidoStakes(viewFor(state, 1))).toEqual({ accepted: 2, declined: 1 })
+
+    const answer = (scores: number[]) => {
+      const game = setup(
+        [
+          [c(7, 'oro'), c(2, 'oro'), c(1, 'copa')],
+          [c(4, 'basto'), c(5, 'copa'), c(6, 'espada')],
+        ],
+        1,
+      )
+      game.scores = scores
+      const call = applyAction(game, 1, { type: 'envido', call: 'envido' })
+      if (!call.ok) throw new Error(call.error)
+      return adviceFor(call.state, 0)
+    }
+    // 29 is worth accepting early in the game...
+    expect(answer([0, 0])?.action.type).toBe('quiero')
+    // ...but not when losing it hands the rival the game.
+    const late = answer([3, 13])
+    expect(late?.action.type).toBe('noQuiero')
+    expect(late?.why).toContain('llega a 15')
+  })
+
+  it('counts a falta envido as what the leader is missing', () => {
+    let state = setup([
+      [c(7, 'oro'), c(6, 'oro'), c(4, 'copa')],
+      [c(4, 'basto'), c(5, 'copa'), c(6, 'espada')],
+    ])
+    state.scores = [8, 12]
+    const called = applyAction(state, 0, { type: 'envido', call: 'faltaEnvido' })
+    if (!called.ok) throw new Error(called.error)
+    state = called.state
+    expect(envidoStakes(viewFor(state, 1))).toEqual({ accepted: 3, declined: 1 })
+  })
+
+  it('reviews one card choice after the round', () => {
+    const round = (mine: Card[], theirs: Card[], moves: [number, number][]) => {
+      let state = setup([mine, theirs], 1)
+      state.round.envido.status = 'closed'
+      for (const [seat, i] of moves) {
+        const card = (seat === 0 ? mine : theirs)[i]!
+        const played = applyAction(state, seat, { type: 'play', card })
+        if (!played.ok) throw new Error(played.error)
+        state = played.state
+      }
+      return state.previous!
+    }
+    // The ancho won the first, but the 3 was enough.
+    const overkill = round(
+      [c(1, 'espada'), c(3, 'copa'), c(4, 'oro')],
+      [c(12, 'oro'), c(5, 'basto'), c(6, 'copa')],
+      [
+        [1, 0],
+        [0, 0],
+        [0, 2],
+        [1, 1],
+        [1, 2],
+        [0, 1],
+      ],
+    )
+    expect(reviewRound(overkill, 0, 1)).toBe(
+      'Usaste el 1 de espada, pero el 3 de copa también ganaba y te guardabas el 1 de espada.',
+    )
+    // A trick thrown away with a winner in hand, and the round lost.
+    const missed = round(
+      [c(4, 'oro'), c(5, 'copa'), c(3, 'copa')],
+      [c(12, 'oro'), c(1, 'espada'), c(7, 'espada')],
+      [
+        [1, 0],
+        [0, 0],
+        [1, 1],
+        [0, 1],
+      ],
+    )
+    expect(reviewRound(missed, 0, 1)).toBe(
+      'Perdiste la primera con el 4 de oro, pero el 3 de copa le ganaba.',
+    )
   })
 })
