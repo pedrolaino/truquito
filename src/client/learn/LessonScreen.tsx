@@ -65,7 +65,8 @@ export function LessonScreen({
   const label = step?.next ?? (index === screens - 2 ? 'Último paso' : undefined)
 
   return (
-    <main className="lesson">
+    // A hand on the table takes exactly one screen, like any game.
+    <main className={step?.kind === 'play' ? 'lesson screen' : 'lesson'}>
       <header className="lesson-bar">
         <button
           type="button"
