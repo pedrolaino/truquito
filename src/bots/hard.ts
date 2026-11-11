@@ -18,7 +18,7 @@ import {
 } from '../engine/game.ts'
 import { config } from '../shared/config.ts'
 import type { Bot } from './bot.ts'
-import { mediumBot } from './medium.ts'
+import { quickMediumBot } from './medium.ts'
 
 function combinations<T>(items: T[], k: number): T[][] {
   if (k === 0) return [[]]
@@ -78,7 +78,7 @@ function rivalPolicy(view: GameView, legal: Action[], random: () => number): Act
     const wants = envidoPoints(view.round.dealt[view.seat]!) >= 26
     return legal.find((a) => a.type === (wants ? 'quiero' : 'noQuiero'))!
   }
-  return mediumBot(view, legal, random)
+  return quickMediumBot(view, legal, random)
 }
 
 /** Plays the rest of the round: itself on the medium heuristics, the rival on `rivalPolicy`. */
@@ -87,7 +87,7 @@ function rollout(start: GameState, me: number, random: () => number): number {
   const round = state.roundNumber
   while (state.winner === null && state.roundNumber === round) {
     const seat = actorOf(state)!
-    const policy = seat === me ? mediumBot : rivalPolicy
+    const policy = seat === me ? quickMediumBot : rivalPolicy
     const action = policy(viewFor(state, seat), legalActions(state, seat), random)
     const result = applyAction(state, seat, action)
     if (!result.ok) throw new Error(result.error)
