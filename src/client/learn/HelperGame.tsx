@@ -51,7 +51,7 @@ export function HelperGame({ onExit }: { onExit: () => void }) {
         : null
 
   return (
-    <main className="helper">
+    <main className="helper screen">
       <header className="helper-bar">
         <button type="button" className="icon-btn" aria-label="Volver a Aprender" onClick={onExit}>
           <ChevronLeft aria-hidden="true" />

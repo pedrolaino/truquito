@@ -64,18 +64,20 @@ export function OnlineRoom({ roomId, navigate }: Props) {
       </main>
     )
 
-  return (
+  const offline = !room.online && (
+    <p role="status" className="alert" style={{ margin: '8px 16px 0' }}>
+      Se cortó la conexión. Reconectando…
+    </p>
+  )
+  return snapshot.game ? (
+    <main className="screen">
+      {offline}
+      <Game snapshot={snapshot} room={room} home={home} />
+    </main>
+  ) : (
     <>
-      {!room.online && (
-        <p role="status" className="alert" style={{ margin: '8px 16px 0' }}>
-          Se cortó la conexión. Reconectando…
-        </p>
-      )}
-      {snapshot.game ? (
-        <Game snapshot={snapshot} room={room} home={home} />
-      ) : (
-        <Waiting roomId={roomId} snapshot={snapshot} />
-      )}
+      {offline}
+      <Waiting roomId={roomId} snapshot={snapshot} />
     </>
   )
 }
