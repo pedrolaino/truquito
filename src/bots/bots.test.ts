@@ -73,6 +73,49 @@ describe('easy bot', () => {
   })
 })
 
+describe('answering a truco', () => {
+  // The bot (seat 1) leads the third trick with a 5 after one trick each, and
+  // the learner calls truco: someone who calls there almost surely beats a 5.
+  function trucoOnAFive(): GameState {
+    let s = setup([
+      [c(3, 'oro'), c(4, 'copa'), c(4, 'espada')],
+      [c(1, 'espada'), c(6, 'oro'), c(5, 'basto')],
+    ])
+    s.round.envido.status = 'closed'
+    for (const [seat, card] of [
+      [0, c(3, 'oro')],
+      [1, c(6, 'oro')],
+      [0, c(4, 'copa')],
+      [1, c(1, 'espada')],
+      [1, c(5, 'basto')],
+    ] as const)
+      s = act(s, seat, { type: 'play', card })
+    return act(s, 0, { type: 'truco' })
+  }
+
+  it.each([
+    ['easy', easyBot],
+    ['medium', mediumBot],
+  ])('%s does not want it with a 5 left on the table', (_, bot) => {
+    const s = trucoOnAFive()
+    for (let seed = 1; seed <= 20; seed++)
+      expect(bot(viewFor(s, 1), legalActions(s, 1), seededRandom(seed))).toEqual({
+        type: 'noQuiero',
+      })
+  })
+
+  it('medium wants it holding the best card', () => {
+    let s = setup([
+      [c(4, 'oro'), c(5, 'copa'), c(6, 'basto')],
+      [c(1, 'espada'), c(1, 'basto'), c(7, 'espada')],
+    ])
+    s.round.envido.status = 'closed'
+    s = act(s, 0, { type: 'truco' })
+    const action = mediumBot(viewFor(s, 1), legalActions(s, 1), seededRandom(1))
+    expect(['quiero', 'truco']).toContain(action.type)
+  })
+})
+
 describe('medium bot', () => {
   it('wins the trick with the lowest card that is enough', () => {
     let s = setup([
@@ -81,6 +124,8 @@ describe('medium bot', () => {
     ])
     s = act(s, 0, { type: 'play', card: c(6, 'basto') })
     s.round.envido.status = 'closed'
+    // With a good hand it would call truco first; only the card is checked here.
+    s.round.truco.level = 4
     const action = mediumBot(viewFor(s, 1), legalActions(s, 1), () => 0.99)
     expect(action).toEqual({ type: 'play', card: c(7, 'copa') })
   })
@@ -205,7 +250,7 @@ describe('levels', () => {
     expect(winRate(mediumBot, easyBot, 200, 1, game)).toBeGreaterThan(0.6)
   })
 
-  it('hard beats medium', { timeout: 120_000 }, () => {
-    expect(winRate(createHardBot(20), mediumBot, 40, 1, game)).toBeGreaterThan(0.55)
+  it('hard beats medium', { timeout: 180_000 }, () => {
+    expect(winRate(createHardBot(20), mediumBot, 100, 1, game)).toBeGreaterThan(0.53)
   })
 })

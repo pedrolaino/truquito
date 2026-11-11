@@ -1,4 +1,5 @@
-import { handStrength } from '../../bots/medium.ts'
+import { winChance } from '../../bots/estimate.ts'
+import { seededRandom } from '../../bots/match.ts'
 import { type Card, cardPower, envidoPoints } from '../../engine/cards.ts'
 import {
   type Action,
@@ -98,7 +99,8 @@ export function advise(view: GameView, legal: Action[]): Advice | null {
   if (legal.length === 0) return null
   const r = view.round
   const points = envidoPoints(r.dealt[view.seat]!)
-  const strength = handStrength(view)
+  // A fixed seed keeps the advice the same while the learner looks at it.
+  const strength = winChance(view, seededRandom(1), 40)
   const envido: Action = { type: 'envido', call: 'envido' }
 
   if (r.envido.status === 'pending') {

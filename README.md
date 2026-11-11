@@ -64,8 +64,8 @@ Each player scores as soon as a call or a round is settled, and the game ends th
 
 A bot is a function that gets only its seat's view and the list of legal actions, never the full game state, so it knows what a person in its seat would know.
 
-- Easy plays almost at random, but only wants the envido with 27 or more.
-- Medium plays like an average player. It knows its envido and how strong its hand is, wins each trick with the lowest card that is enough, and calls truco or envido with a good hand or, now and then, as a bluff.
+- Easy plays half its cards at random and only wants the envido with 27 or more. It answers a truco by its chances of winning, but reads them loosely.
+- Medium plays like an average player. It knows its envido, wins each trick with the lowest card that is enough, and weighs a truco by playing the round out against two dozen hands the opponent could hold, so a card already on the table counts. Now and then it bluffs.
 - Hard uses determinization. It builds every hand the opponent could hold given what it has seen (cards played, announced points or "son buenas", whether they sang flor), samples 40 of them, plays each legal action to the end of the round in every sample and keeps the action that scores best. The number of samples is fixed, so it does not depend on how fast the device is.
 
 Bots wait between 0.6 and 1.4 seconds before each move, about as long as a person takes to think.
@@ -74,11 +74,11 @@ Bots wait between 0.6 and 1.4 seconds before each move, about as long as a perso
 
 | Pairing        | Win rate |
 | -------------- | -------- |
-| Medium vs easy | 86.3%    |
-| Hard vs easy   | 84.2%    |
-| Hard vs medium | 69.8%    |
+| Medium vs easy | 74.7%    |
+| Hard vs easy   | 64.2%    |
+| Hard vs medium | 60.5%    |
 
-Hard simulates its opponent as a medium player who accepts any envido with 26 or more, so it is at its best against players who think like that. Easy plays close to random and rarely gives it anything to read, which is why hard beats it about as often as medium does.
+Hard simulates its opponent as a medium player who accepts any envido with 26 or more, so it is at its best against players who think like that. Easy reads its hand loosely and plays half its cards at random, which hard does not model, so medium beats it more often than hard does.
 
 ## Tech stack
 
