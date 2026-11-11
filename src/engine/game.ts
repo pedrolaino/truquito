@@ -241,6 +241,15 @@ function facingAFour(round: RoundView, seat: number): boolean {
   return trick.cards[seat] === null && trick.cards.some((c, s) => s !== seat && c?.rank === 4)
 }
 
+/** Whether truco would be legal for this seat now if it weren't for a rival's 4 on the table. */
+export function trucoWaitsForAFour(game: Public, seat: number): boolean {
+  if (actorOf(game) !== seat) return false
+  const r = game.round
+  if (r.envido.status === 'pending' || !facingAFour(r, seat)) return false
+  if (r.truco.pending) return r.truco.pending.level < 4
+  return r.truco.level === 1 || (r.truco.holder === seat && r.truco.level < 4)
+}
+
 export function legalActions(game: Public, seat: number): Action[] {
   if (actorOf(game) !== seat) return []
   const r = game.round

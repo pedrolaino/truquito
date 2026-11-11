@@ -1,9 +1,16 @@
 import { X } from 'lucide-react'
 import { useEffect, useRef } from 'react'
-import { GuideContent } from './Guide.tsx'
+import { GuideContent, type GuideSection } from './Guide.tsx'
 
 /** The quick guide over the game table, so a game does not have to stop. */
-export function GuideSheet({ onClose }: { onClose: () => void }) {
+export function GuideSheet({
+  section,
+  onClose,
+}: {
+  /** Where to open it, for lessons about one topic. */
+  section?: GuideSection
+  onClose: () => void
+}) {
   const heading = useRef<HTMLHeadingElement>(null)
   useEffect(() => {
     heading.current?.focus()
@@ -31,7 +38,7 @@ export function GuideSheet({ onClose }: { onClose: () => void }) {
             <X aria-hidden="true" />
           </button>
         </div>
-        <GuideContent />
+        <GuideContent section={section} />
       </section>
     </div>
   )

@@ -8,6 +8,7 @@ import {
   handOf,
   legalActions,
   nextSeat,
+  trucoWaitsForAFour,
 } from '../engine/game.ts'
 import { CardBack, CardButton, CardView } from './Card.tsx'
 import { Fosforos } from './Fosforos.tsx'
@@ -86,6 +87,9 @@ export function Table({
   const hand = handOf(round, me)
   const rivalCards = 3 - round.tricks.filter((t) => t.cards[rival]).length
   const calls = legal.filter((a) => a.type !== 'play')
+  // The truco button stays in sight, off, so a missing truco isn't a mystery.
+  const fourBlocks = !busy && !allow && trucoWaitsForAFour(view, me)
+  const buttons = calls.length + (fourBlocks ? 1 : 0)
   const canPlay = (card: (typeof hand)[number]) =>
     legal.some((a) => a.type === 'play' && sameCard(a.card, card))
   const lines = shownEvents.map((e) => eventText(e, names)).filter((t): t is string => t !== null)
@@ -242,7 +246,7 @@ export function Table({
           aria-label="Cantos"
           className="calls"
           // Two rows always: fewer buttons get wider, so long calls fit.
-          style={{ '--cols': calls.length <= 4 ? 2 : calls.length <= 6 ? 3 : 4 } as CSSProperties}
+          style={{ '--cols': buttons <= 4 ? 2 : buttons <= 6 ? 3 : 4 } as CSSProperties}
         >
           {calls.map((action) => (
             <button
@@ -262,6 +266,11 @@ export function Table({
               {actionLabel(action, view)}
             </button>
           ))}
+          {fourBlocks && (
+            <button type="button" className="btn btn-blocked" disabled>
+              Al 4 no se canta truco
+            </button>
+          )}
         </div>
       </div>
 

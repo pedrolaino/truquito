@@ -10,6 +10,7 @@ import {
   createGame,
   legalActions,
   startRound,
+  trucoWaitsForAFour,
   viewFor,
 } from './game.ts'
 
@@ -433,9 +434,11 @@ describe('truco', () => {
   it('cannot be called or raised on a 4 until you play', () => {
     const g = new Game(setup([a, b])).plays(a[2]!)
     expect(has(g.state, 1, TRUCO)).toBe(false)
+    expect(trucoWaitsForAFour(g.state, 1)).toBe(true)
     expect(applyAction(g.state, 1, TRUCO).ok).toBe(false)
     g.plays(b[1]!)
     expect(has(g.state, 1, TRUCO)).toBe(true)
+    expect(trucoWaitsForAFour(g.state, 1)).toBe(false)
 
     const raised = new Game(setup([a, b])).do(0, TRUCO).do(1, QUIERO).plays(a[2]!)
     expect(has(raised.state, 1, TRUCO)).toBe(false)
