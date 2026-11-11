@@ -39,8 +39,8 @@ interface Props {
   hideScore?: boolean
   /** Lessons: play moves out slower so a beginner can follow them. */
   slow?: boolean
-  /** Practice with the coach: advice shown right above the hand instead of the turn line. */
-  tip?: string | null
+  /** Advice or a lesson's cue, shown right above the hand instead of the turn line. */
+  tip?: ReactNode
   /** Told whenever moves start or stop playing out on screen. */
   onBusyChange?: (busy: boolean) => void
 }
@@ -202,9 +202,9 @@ export function Table({
               {announcement.text}
             </p>
           ) : tip !== undefined ? (
-            <p className="tip" role="status">
+            <div className="tip" role="status">
               {tip}
-            </p>
+            </div>
           ) : (
             <p
               className={myTurn ? 'turn your-turn' : 'turn'}

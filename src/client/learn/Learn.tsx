@@ -27,7 +27,13 @@ export function Learn({ path, navigate }: { path: string; navigate: (path: strin
   }, [lesson])
 
   if (id === 'guia') return <GuidePage navigate={navigate} />
-  if (id === 'ayudante') return <HelperGame onExit={() => navigate('/aprender')} />
+  if (id === 'ayudante')
+    return (
+      <HelperGame
+        onExit={() => navigate('/aprender')}
+        onPractice={(lesson) => navigate(`/aprender/${lesson}`)}
+      />
+    )
   if (!lesson)
     return (
       <LearnHub lessons={LESSONS} done={done} lastTime={savedLessonTime()} navigate={navigate} />
