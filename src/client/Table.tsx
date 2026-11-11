@@ -31,9 +31,9 @@ interface Props {
   rivalStatus?: ReactNode
   /** Game over panel, shown once the last move has played out. */
   over?: ReactNode
-  /** Lessons: only these moves can be made, and they are highlighted. */
+  /** Lessons: only these moves can be made, and they are highlighted unless `highlight` is given. */
   allow?: (action: Action) => boolean
-  /** Practice with the coach: moves to point out without restricting the others. */
+  /** Moves to point out, without restricting the others. */
   highlight?: (action: Action) => boolean
   /** Lessons: leave out the score bar to make room. */
   hideScore?: boolean
@@ -233,9 +233,7 @@ export function Table({
               card={card}
               disabled={!canPlay(card)}
               onPlay={() => onAction({ type: 'play', card })}
-              suggested={
-                allow ? canPlay(card) : !!highlight?.({ type: 'play', card }) && canPlay(card)
-              }
+              suggested={(highlight ? highlight({ type: 'play', card }) : !!allow) && canPlay(card)}
               style={{ '--i': i } as CSSProperties}
             />
           ))}
@@ -253,7 +251,7 @@ export function Table({
               key={actionLabel(action, view)}
               type="button"
               className={
-                allow || highlight?.(action)
+                (highlight ? highlight(action) : allow)
                   ? 'btn suggested'
                   : action.type === 'mazo'
                     ? 'btn btn-quiet'
