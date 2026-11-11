@@ -77,6 +77,12 @@ export function playSound(event: GameEvent, me: number) {
   }
 }
 
+/** A soft ping when the turn comes back to the player. */
+export function playTurn() {
+  tone(784, 0, 0.12, 0.07)
+  tone(1047, 0.1, 0.18, 0.07)
+}
+
 /** Right or wrong answer in a lesson. */
 export function playFeedback(right: boolean) {
   if (savedMuted()) return

@@ -16,6 +16,8 @@ export const config = {
   pace: {
     play: { mine: 250, theirs: 650 },
     speech: { mine: 700, theirs: 1300 },
+    /** The rival's quiero, no quiero or son buenas, which hand the turn back. */
+    answer: 2000,
     trick: 1000,
     score: 900,
     roundEnd: 1900,

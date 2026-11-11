@@ -683,6 +683,32 @@ button.card:disabled {
   font-weight: 700;
 }
 
+.your-turn {
+  padding: 6px 18px;
+  border-radius: 999px;
+  background: var(--accent);
+  color: var(--accent-ink);
+  font-family: var(--font-display);
+  font-size: 18px;
+  font-weight: 800;
+  box-shadow: 3px 3px 0 var(--ink);
+  animation: your-turn 520ms var(--ease-out) both;
+}
+
+@keyframes your-turn {
+  0% {
+    transform: scale(0.6);
+    opacity: 0;
+  }
+  60% {
+    transform: scale(1.12);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
 .hand {
   display: flex;
   justify-content: center;

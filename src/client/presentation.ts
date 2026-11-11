@@ -9,13 +9,14 @@ export function eventDuration(event: GameEvent, me: number): number {
   switch (event.type) {
     case 'play':
       return mine ? pace.play.mine : pace.play.theirs
-    case 'call':
     case 'quiero':
     case 'noQuiero':
+    case 'sonBuenas':
+      return mine ? pace.speech.mine : pace.answer
+    case 'call':
     case 'mazo':
     case 'flor':
     case 'points':
-    case 'sonBuenas':
       return mine ? pace.speech.mine : pace.speech.theirs
     case 'trick':
       return pace.trick

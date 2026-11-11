@@ -15,7 +15,7 @@ import { actionLabel, eventText, scoreText } from './text.ts'
 import { useEffect, useState } from 'react'
 import { CircleHelp, Volume2, VolumeX } from 'lucide-react'
 import { GuideSheet } from './learn/GuideSheet.tsx'
-import { playSound } from './sound.ts'
+import { playSound, playTurn } from './sound.ts'
 import { saveMuted, savedMuted } from './storage.ts'
 import { config } from '../shared/config.ts'
 import { usePresentation } from './usePresentation.ts'
@@ -76,6 +76,11 @@ export function Table({
   // While a move is still being shown nothing can be played.
   const legal = busy ? [] : legalActions(view, me).filter((a) => !allow || allow(a))
   useEffect(() => onBusyChange?.(busy), [busy, onBusyChange])
+  const myTurn = !busy && actorOf(view) === me
+  // Answers like "quiero" pass quickly, so a chime says the turn is back.
+  useEffect(() => {
+    if (myTurn && !muted) playTurn()
+  }, [myTurn, muted])
   const actor = actorOf(view)
   const round = view.round
   const hand = handOf(round, me)
@@ -197,13 +202,17 @@ export function Table({
               {tip}
             </p>
           ) : (
-            <p className="turn">
+            <p
+              className={myTurn ? 'turn your-turn' : 'turn'}
+              // A new key replays the pop each time the turn comes back.
+              key={myTurn ? shownEvents.length : 'waiting'}
+            >
               {busy
                 ? ''
                 : actor === null
                   ? 'Partida terminada'
                   : actor === me
-                    ? 'Te toca'
+                    ? '¡Te toca!'
                     : `Esperando a ${names[actor]}…`}
             </p>
           )}
