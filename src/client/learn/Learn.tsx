@@ -1,5 +1,5 @@
 import { useCallback, useState } from 'react'
-import { saveLessons, savedLessons } from '../storage.ts'
+import { saveLessonTime, saveLessons, savedLessonTime, savedLessons } from '../storage.ts'
 import { GuidePage } from './GuidePage.tsx'
 import { HelperGame } from './HelperGame.tsx'
 import { LearnHub } from './LearnHub.tsx'
@@ -17,6 +17,7 @@ export function Learn({ path, navigate }: { path: string; navigate: (path: strin
 
   const finish = useCallback(() => {
     if (!lesson) return
+    saveLessonTime(Date.now())
     setDone((current) => {
       if (current.has(lesson.id)) return current
       const next = new Set(current).add(lesson.id)
@@ -27,12 +28,16 @@ export function Learn({ path, navigate }: { path: string; navigate: (path: strin
 
   if (id === 'guia') return <GuidePage navigate={navigate} />
   if (id === 'ayudante') return <HelperGame onExit={() => navigate('/aprender')} />
-  if (!lesson) return <LearnHub lessons={LESSONS} done={done} navigate={navigate} />
+  if (!lesson)
+    return (
+      <LearnHub lessons={LESSONS} done={done} lastTime={savedLessonTime()} navigate={navigate} />
+    )
   const next = LESSONS[index + 1] ?? null
   return (
     <LessonScreen
       key={lesson.id}
       lesson={lesson}
+      number={index + 1}
       doneCount={done.size + (done.has(lesson.id) ? 0 : 1)}
       total={LESSONS.length}
       next={next}

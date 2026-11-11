@@ -48,3 +48,11 @@ export function savedLessons(): string[] {
 }
 
 export const saveLessons = (ids: string[]) => write('truquito:lessons', JSON.stringify(ids))
+
+/** When the last lesson was finished, in ms since the epoch; 0 if never. */
+export function savedLessonTime(): number {
+  const time = Number(read('truquito:lessons-at'))
+  return Number.isFinite(time) && time > 0 ? time : 0
+}
+
+export const saveLessonTime = (time: number) => write('truquito:lessons-at', String(time))

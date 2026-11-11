@@ -34,12 +34,15 @@ export const LESSONS: Lesson[] = [
     id: 'objetivo',
     title: 'De qué se trata',
     summary: 'Cómo se gana una partida',
+    hook: 'Una partida de truco dura 5 minutos y se juega con lo que tengas: un mazo, un teléfono, un asado de fondo. En 2 minutos vas a entender cómo funciona.',
+    outro: 'Ya sabés cómo funciona una partida. Ahora: las cartas.',
     steps: [
       {
         kind: 'say',
         title: 'Gana el primero que llega a 15',
         text: 'Se juega de a dos o en equipos. La partida es a 15 puntos, o a 30 si quieren jugar más largo.',
         visual: <Fosforos points={15} target={15} big />,
+        next: 'Mirá esto',
       },
       {
         kind: 'say',
@@ -50,6 +53,32 @@ export const LESSONS: Lesson[] = [
           ['El truco', '2, 3 o 4 puntos'],
           ['El envido', '2 puntos o más'],
         ],
+        next: 'Ahora probalo',
+      },
+      {
+        kind: 'play',
+        title: 'Probá tirar una carta',
+        play: {
+          hands: [
+            [c(3, 'copa'), c(5, 'oro'), c(11, 'basto')],
+            [c(12, 'oro'), c(6, 'espada'), c(4, 'copa')],
+          ],
+          mano: 0,
+          rival: [play(c(12, 'oro')), play(c(4, 'copa'))],
+          cues: [
+            {
+              say: 'Empezás vos. Gana la carta más fuerte, y el 3 es de las mejores: tiralo.',
+              expect: play(c(3, 'copa')),
+            },
+            {
+              say: 'Ganaste la primera de tres. Tirá cualquiera: si ganás otra, la mano es tuya.',
+              expect: play(c(5, 'oro')),
+              or: [play(c(11, 'basto'))],
+            },
+          ],
+          goal: roundOver,
+          done: 'Acabás de ganar tu primera mano. Eso es 1 punto.',
+        },
       },
       {
         kind: 'say',
@@ -68,14 +97,17 @@ export const LESSONS: Lesson[] = [
   },
   {
     id: 'cartas',
-    title: 'Las cartas',
-    summary: 'Qué carta le gana a cuál',
+    title: 'Cuál le gana a cuál',
+    summary: 'La escala de las cartas',
+    hook: 'En el truco no gana la carta más alta: gana la que está más arriba en una escala que tiene su propia lógica. Acá vas a ver cuáles son las que mandan.',
+    outro: 'Ya sabés qué carta le gana a cuál. Ahora: a jugar.',
     steps: [
       {
         kind: 'say',
         title: 'Cuarenta cartas, cuatro palos',
-        text: 'Se juega con la baraja española: espada, basto, oro y copa, del 1 al 12 sin 8 ni 9.',
+        text: 'Se juega con la baraja española: espada, basto, oro y copa, del 1 al 12 sin 8 ni 9. La escala no hace falta memorizarla: se aprende jugando, y siempre la podés consultar en la Guía rápida.',
         visual: <Cards cards={[c(1, 'espada'), c(1, 'basto'), c(1, 'oro'), c(1, 'copa')]} />,
+        next: 'Dale, mostrame',
       },
       {
         kind: 'say',
@@ -93,6 +125,7 @@ export const LESSONS: Lesson[] = [
         a: c(7, 'espada'),
         b: c(1, 'basto'),
         explain: 'El ancho de basto es la segunda carta más fuerte: le gana al siete de espada.',
+        praise: 'Ya ubicás las cuatro de arriba.',
       },
       {
         kind: 'say',
@@ -139,18 +172,21 @@ export const LESSONS: Lesson[] = [
         a: c(2, 'espada'),
         b: c(2, 'oro'),
         explain: 'Los dos son 2: el palo no importa, es parda.',
+        praise: 'La escala ya te va entrando.',
       },
       {
         kind: 'say',
-        title: 'No hace falta memorizarla ya',
-        text: 'La escala completa está en la Guía rápida. En la mesa la abrís con el botón de ayuda.',
+        title: 'Siempre la tenés a mano',
+        text: '¿Ves? No era tanta. Las cuatro de arriba, los 3, los 2, los anchos falsos y las negras. Lo demás se aprende en la mesa. Y si te trabás, la Guía rápida está siempre en el botón ?.',
       },
     ],
   },
   {
     id: 'ronda',
-    title: 'La mano',
+    title: 'Jugá una mano entera',
     summary: 'Las tres bazas y quién empieza',
+    hook: 'Ya sabés qué carta le gana a cuál. Ahora vas a jugar manos de verdad: tirar, ganar bazas y sumar puntos.',
+    outro: 'Ya podés jugar una mano entera. Ahora viene lo que hace al truco interesante.',
     steps: [
       {
         kind: 'say',
@@ -167,10 +203,12 @@ export const LESSONS: Lesson[] = [
         kind: 'say',
         title: 'Quién empieza',
         text: 'El que es mano tira primero. Después de cada baza empieza el que la ganó. En la mano siguiente, el mano es el otro.',
+        next: 'Ahora jugala',
       },
       {
         kind: 'play',
         title: 'Jugá una mano',
+        hint: 'Si no te acordás cuál gana, abrí la Guía rápida con el ?.',
         play: {
           hands: [
             [c(1, 'espada'), c(3, 'copa'), c(5, 'oro')],
@@ -186,7 +224,7 @@ export const LESSONS: Lesson[] = [
             },
           ],
           goal: roundOver,
-          done: 'Ganaste la primera y la segunda: la mano es tuya y sumás 1 punto.',
+          done: 'Ganaste la primera y la segunda: la mano es tuya y sumás 1 punto. Eso es jugar al truco.',
         },
       },
       {
@@ -216,15 +254,18 @@ export const LESSONS: Lesson[] = [
             },
           ],
           goal: roundOver,
-          done: 'Perdiste la primera pero ganaste las otras dos. Guardar el 7 de oro te dio la mano.',
+          done: 'Perdiste la primera pero ganaste las otras dos. Guardar la buena y tirar la mala: eso es pensar.',
         },
       },
     ],
   },
   {
     id: 'pardas',
-    title: 'Las pardas',
-    summary: 'Qué pasa cuando empatan',
+    title: 'Qué pasa si empatan',
+    summary: 'Las pardas',
+    hook: '¿Qué pasa cuando los dos tiran una carta igual de fuerte? No es tan raro, y cambia quién gana la mano.',
+    outro:
+      'Ya sabés jugar manos, con pardas y todo. Ahora viene lo que hace al truco distinto: apostar, mentir y hacer que el otro se achique. Lo mejor del juego.',
     steps: [
       {
         kind: 'say',
@@ -274,13 +315,16 @@ export const LESSONS: Lesson[] = [
   },
   {
     id: 'truco',
-    title: 'El truco',
-    summary: 'Cómo apostar más por la mano',
+    title: 'Apostar por la mano',
+    summary: 'El truco, el retruco y el vale cuatro',
+    hook: 'Hasta ahora, ganar una mano daba 1 punto. Poco. El truco es la forma de apostar más por una mano, y también de asustar al otro para que se rinda.',
+    outro: 'Ya sabés cantar truco, subir y saber cuándo no querer. Falta el envido.',
     steps: [
       {
         kind: 'say',
         title: 'Cantar truco',
         text: 'En tu turno, antes de tirar, podés cantar truco. Si te lo quieren, la mano pasa a valer 2 puntos.',
+        next: 'Mirá esto',
       },
       {
         kind: 'say',
@@ -291,6 +335,7 @@ export const LESSONS: Lesson[] = [
           ['No quiero', 'El que cantó se lleva 1 punto y la mano termina.'],
           ['Quiero retruco', 'Aceptás y subís la apuesta a 3.'],
         ],
+        next: 'Ahora probalo',
       },
       {
         kind: 'play',
@@ -318,6 +363,7 @@ export const LESSONS: Lesson[] = [
         kind: 'say',
         title: 'Saber no querer',
         text: 'Si te cantan truco y tus cartas son flojas, conviene decir No quiero: perdés 1 punto en vez de 2.',
+        next: '¿Y si te cantan a vos?',
       },
       {
         kind: 'play',
@@ -336,7 +382,7 @@ export const LESSONS: Lesson[] = [
             },
           ],
           goal: roundOver,
-          done: 'El rival sumó 1 punto en vez de 2. A veces conviene perder poco.',
+          done: 'El rival sumó 1 punto en vez de 2. Saber no querer es tan importante como saber cantar.',
         },
       },
       {
@@ -367,8 +413,10 @@ export const LESSONS: Lesson[] = [
   },
   {
     id: 'contar-envido',
-    title: 'Contar el envido',
-    summary: 'Cuántos puntos tenés',
+    title: 'Contá tus puntos',
+    summary: 'Cuánto tenés de envido',
+    hook: 'Tus cartas tienen un valor escondido que depende de los palos. Saber contarlo te da puntos extra en cada mano, sin jugarla mejor.',
+    outro: 'Ya contás el envido sin pensar. Ahora: cómo apostarlo.',
     steps: [
       {
         kind: 'say',
@@ -392,12 +440,15 @@ export const LESSONS: Lesson[] = [
         title: 'Sin dos del mismo palo',
         text: 'Vale tu carta más alta, pero las negras siguen valiendo 0. Acá el 11 no cuenta y tenés 7.',
         visual: <Cards cards={[c(4, 'basto'), c(7, 'copa'), c(11, 'oro')]} />,
+        next: 'A ver si lo contás',
       },
       {
         kind: 'count',
         hand: [c(6, 'copa'), c(3, 'copa'), c(1, 'espada')],
         options: [9, 29, 23],
         explain: 'El 6 y el 3 son de copa: 20 + 6 + 3 = 29.',
+        praise: 'Si podés contar este, podés contar cualquiera.',
+        hint: 'Podés consultar la regla del envido en la Guía rápida.',
       },
       {
         kind: 'count',
@@ -417,13 +468,16 @@ export const LESSONS: Lesson[] = [
         hand: [c(7, 'espada'), c(6, 'espada'), c(1, 'basto')],
         options: [34, 33, 13],
         explain: '20 + 7 + 6 = 33. Es lo máximo que se puede tener.',
+        praise: 'Cuando te toque un 33 en una partida, lo vas a sentir.',
       },
     ],
   },
   {
     id: 'cantar-envido',
-    title: 'Cantar el envido',
+    title: 'Apostar con el envido',
     summary: 'Envido, real envido y falta envido',
+    hook: 'Ya sabés cuántos puntos de envido tenés. Ahora viene la apuesta: cantarlo en la mesa, subirlo y decidir cuándo conviene y cuándo no.',
+    outro: 'Truco y envido: ya tenés las dos apuestas. Quedan la flor y la parte más divertida.',
     steps: [
       {
         kind: 'say',
@@ -434,10 +488,12 @@ export const LESSONS: Lesson[] = [
         kind: 'say',
         title: 'Cómo se compara',
         text: 'Si te lo quieren, el mano dice sus puntos primero. Si el otro no tiene más, dice Son buenas. Si empatan, gana el mano.',
+        next: 'Ahora cantalo',
       },
       {
         kind: 'play',
         title: 'Cantá envido',
+        hint: 'Si te trabás con los cantos, el ? te muestra cuánto vale cada uno.',
         play: {
           hands: [
             [c(7, 'oro'), c(6, 'oro'), c(4, 'copa')],
@@ -461,6 +517,27 @@ export const LESSONS: Lesson[] = [
         ],
       },
       {
+        kind: 'play',
+        title: 'Envido, envido, real envido',
+        play: {
+          hands: [
+            [c(7, 'espada'), c(5, 'espada'), c(10, 'copa')],
+            [c(6, 'oro'), c(3, 'oro'), c(12, 'basto')],
+          ],
+          mano: 0,
+          rival: [ENVIDO, QUIERO],
+          cues: [
+            { say: 'Tenés 32 de envido. Cantá envido.', expect: ENVIDO },
+            {
+              say: 'El rival lo subió con otro envido. Tenés 32, subí más: cantá real envido.',
+              expect: REAL_ENVIDO,
+            },
+          ],
+          goal: envidoScored,
+          done: 'Envido, envido y real envido: si te lo quieren son 7 puntos. El rival dijo Son buenas: 7 para vos.',
+        },
+      },
+      {
         kind: 'say',
         title: 'Se va sumando',
         text: 'Si al final te lo quieren, el que tiene más puntos de envido se lleva todo lo cantado.',
@@ -473,23 +550,23 @@ export const LESSONS: Lesson[] = [
       },
       {
         kind: 'play',
-        title: 'Envido, envido, real envido',
+        title: 'No te lo quisieron',
         play: {
           hands: [
-            [c(7, 'basto'), c(4, 'basto'), c(1, 'espada')],
-            [c(5, 'oro'), c(2, 'oro'), c(12, 'espada')],
+            [c(1, 'copa'), c(4, 'copa'), c(7, 'basto')],
+            [c(3, 'espada'), c(11, 'oro'), c(6, 'basto')],
           ],
           mano: 0,
-          rival: [ENVIDO, QUIERO],
+          rival: [ENVIDO, NO_QUIERO],
           cues: [
-            { say: 'Tenés 31 de envido. Cantá envido.', expect: ENVIDO },
+            { say: 'Tenés 25 de envido. Cantá envido.', expect: ENVIDO },
             {
-              say: 'El rival lo subió con otro envido: ya van 4. Con 31 podés subir más: cantá real envido.',
+              say: 'El rival lo subió: van dos envidos, 4 puntos. Subí más: cantá real envido.',
               expect: REAL_ENVIDO,
             },
           ],
           goal: envidoScored,
-          done: 'Te lo quisieron y el rival dijo Son buenas. Envido, envido y real envido: 2 + 2 + 3 = 7 puntos para vos.',
+          done: 'No te lo quisieron: te llevás lo que valía antes del real envido, 4 puntos. Cuando no te quieren, te llevás lo acumulado antes de tu último canto.',
         },
       },
       {
@@ -540,6 +617,7 @@ export const LESSONS: Lesson[] = [
         kind: 'say',
         title: 'El envido va primero',
         text: 'Si te cantan truco y todavía no tiraste, podés contestar con envido. Se juega el envido y después respondés el truco.',
+        next: 'Esto pasa seguido',
       },
       {
         kind: 'play',
@@ -578,6 +656,9 @@ export const LESSONS: Lesson[] = [
     id: 'flor',
     title: 'La flor',
     summary: 'Solo si juegan con flor',
+    hook: 'Si tus tres cartas son del mismo palo, tenés flor. Es raro, pero cuando pasa vale mucho. Esta es la lección más corta.',
+    outro:
+      'Si alguna vez te tocan tres del mismo palo, vas a saber qué hacer. Última lección: mentir.',
     steps: [
       {
         kind: 'say',
@@ -594,8 +675,10 @@ export const LESSONS: Lesson[] = [
   },
   {
     id: 'mentir',
-    title: 'Mentir',
-    summary: 'Cantar sin tener cartas',
+    title: 'Ganar sin cartas',
+    summary: 'Mentir en el truco y en el envido',
+    hook: 'A veces tus cartas son horribles y la mano parece perdida. Pero el rival no las ve. Esto es lo que hace al truco distinto de cualquier otro juego de cartas.',
+    outro: 'Ya sabés todo lo que necesitás. Jugá una partida con ayudante y llevalo a la mesa.',
     steps: [
       {
         kind: 'say',
@@ -606,6 +689,7 @@ export const LESSONS: Lesson[] = [
         kind: 'say',
         title: 'Por qué funciona',
         text: 'Si el otro tampoco tiene buenas cartas, le conviene decir No quiero. Así te llevás la mano sin jugarla.',
+        next: 'Probá mentir',
       },
       {
         kind: 'play',
@@ -624,7 +708,7 @@ export const LESSONS: Lesson[] = [
             },
           ],
           goal: roundOver,
-          done: 'El rival no te lo quiso: te llevaste 1 punto con cartas malas.',
+          done: 'El rival no te lo quiso: te llevaste 1 punto con cartas malas. Así se juega el truco de verdad.',
         },
       },
       {
@@ -636,6 +720,7 @@ export const LESSONS: Lesson[] = [
         kind: 'say',
         title: 'También en el envido',
         text: 'Si sentís que el otro tiene pocos puntos, podés cantar envido aunque vos tampoco tengas, para rascar 1 punto si no te lo quiere. Si te lo quiere y tiene más, se lleva 2.',
+        next: 'Mirá esto',
       },
       {
         kind: 'say',
@@ -657,6 +742,7 @@ export const LESSONS: Lesson[] = [
         answer: 0,
         explain:
           'Si te quieren la mentira, se juega por 2 y tenés que ganarla con tus cartas. Por eso es arriesgado.',
+        praise: 'Mentí con cuidado.',
       },
       {
         kind: 'choose',

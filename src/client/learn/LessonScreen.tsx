@@ -1,4 +1,4 @@
-import { Check, X } from 'lucide-react'
+import { ArrowRight, Check, CircleHelp, X } from 'lucide-react'
 import {
   type ReactNode,
   useCallback,
@@ -17,11 +17,22 @@ import { Fosforos } from '../Fosforos.tsx'
 import { playFeedback } from '../sound.ts'
 import { Table } from '../Table.tsx'
 import { cardName } from '../text.ts'
+import { GuideSheet } from './GuideSheet.tsx'
 import { scrollToSuggestion } from './scroll.ts'
-import { type Lesson, ME, type Play, type Step, playStart, sameAction } from './lesson.ts'
+import {
+  type Lesson,
+  ME,
+  type Play,
+  type Step,
+  cueAllows,
+  playStart,
+  sameAction,
+} from './lesson.ts'
 
 interface Props {
   lesson: Lesson
+  /** Its place in the list, from 1. */
+  number: number
   /** How many lessons are done, counting this one once it ends. */
   doneCount: number
   total: number
@@ -31,12 +42,27 @@ interface Props {
   onNext: () => void
 }
 
-export function LessonScreen({ lesson, doneCount, total, next, onFinish, onExit, onNext }: Props) {
+export function LessonScreen({
+  lesson,
+  number,
+  doneCount,
+  total,
+  next,
+  onFinish,
+  onExit,
+  onNext,
+}: Props) {
+  // Screen 0 is the hook; the steps follow.
   const [index, setIndex] = useState(0)
-  const finished = index >= lesson.steps.length
+  const [guide, setGuide] = useState(false)
+  const screens = lesson.steps.length + 1
+  const finished = index >= screens
+  const progress = Math.min(index, screens)
   useEffect(() => {
     if (finished) onFinish()
   }, [finished, onFinish])
+  const step = lesson.steps[index - 1]
+  const label = step?.next ?? (index === screens - 2 ? 'Último paso' : undefined)
 
   return (
     <main className="lesson">
@@ -54,15 +80,20 @@ export function LessonScreen({ lesson, doneCount, total, next, onFinish, onExit,
           role="progressbar"
           aria-label={`Avance de ${lesson.title}`}
           aria-valuemin={0}
-          aria-valuemax={lesson.steps.length}
-          aria-valuenow={Math.min(index, lesson.steps.length)}
+          aria-valuemax={screens}
+          aria-valuenow={progress}
         >
-          <span
-            style={{
-              width: `${(Math.min(index, lesson.steps.length) / lesson.steps.length) * 100}%`,
-            }}
-          />
+          <span style={{ width: `${(progress / screens) * 100}%` }} />
         </div>
+        <button
+          type="button"
+          className="icon-btn"
+          aria-label="Guía rápida"
+          title="Guía rápida"
+          onClick={() => setGuide(true)}
+        >
+          <CircleHelp aria-hidden="true" />
+        </button>
       </header>
       {finished ? (
         <section className="lesson-step lesson-done" aria-labelledby="lesson-done">
@@ -74,6 +105,7 @@ export function LessonScreen({ lesson, doneCount, total, next, onFinish, onExit,
           <p className="lead">
             Llevás {doneCount} de {total} lecciones.
           </p>
+          <p className="lesson-text">{lesson.outro}</p>
           <Fosforos points={doneCount} target={0} big />
           <div className="lesson-actions">
             <button type="button" className="btn btn-primary" onClick={onNext}>
@@ -84,19 +116,37 @@ export function LessonScreen({ lesson, doneCount, total, next, onFinish, onExit,
             </button>
           </div>
         </section>
+      ) : step ? (
+        <StepView key={index} step={step} label={label} onDone={() => setIndex(index + 1)} />
       ) : (
-        <StepView
-          key={index}
-          step={lesson.steps[index]!}
-          first={index === 0}
-          onDone={() => setIndex(index + 1)}
-        />
+        <section className="lesson-step lesson-hook" aria-labelledby="step-title">
+          <p className="lesson-kicker">Lección {number}</p>
+          <h1 id="step-title">{lesson.title}</h1>
+          <p className="lesson-text">{lesson.hook}</p>
+          <div className="lesson-actions">
+            <button type="button" className="btn btn-primary" onClick={() => setIndex(1)} autoFocus>
+              Empezar
+            </button>
+          </div>
+        </section>
       )}
+      {guide && <GuideSheet onClose={() => setGuide(false)} />}
     </main>
   )
 }
 
-function StepView({ step, first, onDone }: { step: Step; first: boolean; onDone: () => void }) {
+function Hint({ text }: { text?: string }) {
+  return text ? <p className="lesson-hint">{text}</p> : null
+}
+
+interface StepProps {
+  step: Step
+  /** Overrides the button's usual label. */
+  label?: string
+  onDone: () => void
+}
+
+function StepView({ step, label, onDone }: StepProps) {
   switch (step.kind) {
     case 'say':
       return (
@@ -114,9 +164,10 @@ function StepView({ step, first, onDone }: { step: Step; first: boolean; onDone:
               ))}
             </dl>
           )}
+          <Hint text={step.hint} />
           <div className="lesson-actions">
             <button type="button" className="btn btn-primary" onClick={onDone} autoFocus>
-              {first ? 'Empezar' : 'Seguir'}
+              {label ?? 'Seguir'}
             </button>
           </div>
         </section>
@@ -126,8 +177,9 @@ function StepView({ step, first, onDone }: { step: Step; first: boolean; onDone:
       const right = diff > 0 ? 'a' : diff < 0 ? 'b' : 'tie'
       return (
         <Quiz
+          step={step}
+          label={label}
           prompt="¿Cuál gana?"
-          explain={step.explain}
           answer={right}
           onDone={onDone}
           options={[
@@ -141,9 +193,10 @@ function StepView({ step, first, onDone }: { step: Step; first: boolean; onDone:
     case 'count':
       return (
         <Quiz
+          step={step}
+          label={label}
           prompt="¿Cuántos tenés de envido?"
           visual={<HandRow cards={step.hand} />}
-          explain={step.explain}
           answer={String(envidoPoints(step.hand))}
           onDone={onDone}
           options={step.options.map((n) => ({
@@ -156,15 +209,24 @@ function StepView({ step, first, onDone }: { step: Step; first: boolean; onDone:
     case 'choose':
       return (
         <Quiz
+          step={step}
+          label={label}
           prompt={step.prompt}
-          explain={step.explain}
           answer={String(step.answer)}
           onDone={onDone}
           options={step.options.map((text, i) => ({ id: String(i), content: text, label: text }))}
         />
       )
     case 'play':
-      return <PlayStep title={step.title} play={step.play} onDone={onDone} />
+      return (
+        <PlayStep
+          title={step.title}
+          play={step.play}
+          hint={step.hint}
+          label={label}
+          onDone={onDone}
+        />
+      )
   }
 }
 
@@ -186,18 +248,20 @@ interface Option {
 }
 
 function Quiz({
+  step,
+  label,
   prompt,
   visual,
   options,
   answer,
-  explain,
   onDone,
 }: {
+  step: Extract<Step, { explain: string }>
+  label?: string
   prompt: string
   visual?: ReactNode
   options: Option[]
   answer: string
-  explain: string
   onDone: () => void
 }) {
   const [picked, setPicked] = useState<string | null>(null)
@@ -214,6 +278,7 @@ function Quiz({
     <section className="lesson-step" aria-labelledby="quiz-prompt">
       {visual && <div className="lesson-visual">{visual}</div>}
       <h1 id="quiz-prompt">{prompt}</h1>
+      {!picked && <Hint text={step.hint} />}
       <div className={options.some((o) => o.card) ? 'quiz-options quiz-cards' : 'quiz-options'}>
         {options.map((o) => (
           <button
@@ -231,9 +296,12 @@ function Quiz({
       {picked && (
         <div className={right ? 'feedback is-right' : 'feedback is-wrong'} role="status">
           <strong>{right ? '¡Bien!' : 'No exactamente'}</strong>
-          <p>{explain}</p>
+          <p>
+            {step.explain}
+            {right && step.praise && <b className="praise"> {step.praise}</b>}
+          </p>
           <button type="button" className="btn btn-primary" onClick={onDone} autoFocus>
-            Seguir
+            {label ?? (right ? 'Bien, seguí' : 'Seguir')}
           </button>
         </div>
       )}
@@ -241,7 +309,19 @@ function Quiz({
   )
 }
 
-function PlayStep({ title, play, onDone }: { title: string; play: Play; onDone: () => void }) {
+function PlayStep({
+  title,
+  play,
+  hint,
+  label,
+  onDone,
+}: {
+  title: string
+  play: Play
+  hint?: string
+  label?: string
+  onDone: () => void
+}) {
   const [game] = useState(() => {
     let used = 0
     // The rival follows the script; past it an easy bot plays, which the goal never needs.
@@ -289,20 +369,23 @@ function PlayStep({ title, play, onDone }: { title: string; play: Play; onDone: 
   useEffect(() => scrollToSuggestion(), [cue, busy])
   const myTurn = !reached && actorOf(state) === ME
   const act = (action: Action) => {
-    if (current && sameAction(action, current.expect) && game.play(action)) setCue(cue + 1)
+    if (current && cueAllows(current, action) && game.play(action)) setCue(cue + 1)
   }
 
   return (
     <section className="lesson-play" aria-label={title}>
-      <p className="coach" role="status">
-        {reached ? '¡Listo!' : busy || !myTurn ? 'Mirá lo que pasa en la mesa…' : current?.say}
-      </p>
+      <div className="coach" role="status">
+        <p>
+          {reached ? '¡Listo!' : busy || !myTurn ? 'Mirá lo que pasa en la mesa…' : current?.say}
+        </p>
+        {hint && !reached && <small>{hint}</small>}
+      </div>
       <Table
         view={shown.view}
         names={['Vos', 'El rival']}
         events={shown.events}
         onAction={act}
-        allow={(a) => !!current && sameAction(a, current.expect)}
+        allow={(a) => !!current && cueAllows(current, a)}
         hideScore
         slow
         onBusyChange={onBusyChange}
@@ -317,7 +400,11 @@ function PlayStep({ title, play, onDone }: { title: string; play: Play; onDone: 
                 <strong id="play-done">¡Bien!</strong>
                 <p>{play.done}</p>
                 <button type="button" className="btn btn-primary" onClick={onDone} autoFocus>
-                  Seguir
+                  {label ?? (
+                    <>
+                      Seguí <ArrowRight aria-hidden="true" />
+                    </>
+                  )}
                 </button>
               </section>
             </div>

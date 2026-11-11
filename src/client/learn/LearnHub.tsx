@@ -5,29 +5,38 @@ import type { Lesson } from './lesson.ts'
 interface Props {
   lessons: Lesson[]
   done: Set<string>
+  /** When the last lesson was finished, 0 if never. */
+  lastTime: number
   navigate: (path: string) => void
 }
 
+const DAY = 24 * 60 * 60 * 1000
+
+function progressText(count: number, total: number, lastTime: number): string {
+  if (count === 0) return 'Empezá por la primera, son 2 minutos.'
+  if (count === total) return '¡Listo! Ya sabés jugar. Animate a una partida.'
+  // Back after a few days, halfway through: a nudge to keep going.
+  if (count >= 3 && count <= 6 && Date.now() - lastTime > 3 * DAY)
+    return `Llevás ${count} de ${total}. La próxima lección son 3 minutos y ya estás cerca de poder jugar de verdad.`
+  return `Llevás ${count} de ${total}. Seguí con la próxima.`
+}
+
 /** Entry point for learning: the quick guide and the lessons, in order. */
-export function LearnHub({ lessons, done, navigate }: Props) {
+export function LearnHub({ lessons, done, lastTime, navigate }: Props) {
   const next = lessons.find((l) => !done.has(l.id))
   const count = lessons.filter((l) => done.has(l.id)).length
   return (
     <main className="page">
       <div>
         <h1 className="page-title">Aprender a jugar</h1>
-        <p className="lead">Todo lo que necesitás para jugar al truco, de a poco.</p>
+        <p className="lead">
+          ¿Todos juegan y vos mirás? En {lessons.length} lecciones vas a saber sentarte a la mesa.
+        </p>
       </div>
 
       <div className="learn-progress">
         <Fosforos points={count} target={0} />
-        <span>
-          {count === 0
-            ? 'Empezá por la primera lección.'
-            : count === lessons.length
-              ? '¡Terminaste todas las lecciones!'
-              : `Llevás ${count} de ${lessons.length} lecciones.`}
-        </span>
+        <span>{progressText(count, lessons.length, lastTime)}</span>
       </div>
 
       <nav aria-label="Lecciones">
@@ -82,7 +91,7 @@ export function LearnHub({ lessons, done, navigate }: Props) {
         <span className="learn-text">
           <span className="learn-title">Guía rápida</span>
           <span className="learn-sub">
-            La escala de cartas, los cantos y el envido, para consultar
+            La escala de cartas, el envido y los cantos, para consultar
           </span>
         </span>
         <ChevronRight aria-hidden="true" />

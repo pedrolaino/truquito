@@ -1417,6 +1417,52 @@ button.card:disabled {
   line-height: 1.5;
 }
 
+.coach p {
+  margin: 0;
+}
+
+.coach small {
+  font-size: 13px;
+  font-weight: 500;
+  opacity: 0.75;
+}
+
+.lesson-hint {
+  margin: 0;
+  font-size: 15px;
+  color: var(--muted);
+}
+
+.praise {
+  font-weight: 800;
+}
+
+.lesson-hook {
+  justify-content: center;
+}
+
+.lesson-hook h1 {
+  font-size: 38px;
+  line-height: 1.05;
+}
+
+.lesson-kicker {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+.lesson-hook .lesson-text {
+  font-size: 21px;
+}
+
+.lesson-hook .lesson-actions {
+  margin-top: 24px;
+}
+
 .lesson-visual {
   display: grid;
   place-items: center;
@@ -1590,7 +1636,9 @@ button.card:disabled {
   min-height: 66px;
   padding: 10px 14px;
   display: flex;
-  align-items: center;
+  flex-direction: column;
+  justify-content: center;
+  gap: 2px;
   border-radius: var(--radius);
   background: var(--ink);
   color: var(--card);
