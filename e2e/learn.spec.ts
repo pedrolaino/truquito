@@ -3,7 +3,7 @@ import { expect, test } from '@playwright/test'
 test('the quick guide opens from the menu and over a game', async ({ page }) => {
   await page.goto('/')
   await page.getByRole('button', { name: /No sabés jugar/ }).click()
-  await page.getByRole('button', { name: /Guía rápida/ }).click()
+  await page.getByRole('button', { name: 'Consultar las reglas' }).click()
   await expect(page.getByRole('heading', { name: 'Qué carta gana' })).toBeVisible()
   await expect(page.getByRole('heading', { level: 2 })).toHaveText([
     'Qué carta gana',
@@ -26,7 +26,8 @@ test('the quick guide opens from the menu and over a game', async ({ page }) => 
 test('a learner can go through every lesson', async ({ page }) => {
   test.setTimeout(300_000)
   await page.clock.install()
-  await page.goto('/aprender/objetivo')
+  await page.goto('/aprender')
+  await page.getByRole('button', { name: 'Jugar mi primera mano' }).click()
 
   const finished = page.getByRole('heading', { name: '¡Lección terminada!' })
   const nextLesson = page.getByRole('button', { name: /^Continuar: / })
@@ -56,7 +57,8 @@ test('a learner can go through every lesson', async ({ page }) => {
   }
 
   await page.getByRole('button', { name: 'Volver al menú' }).click()
-  await expect(page.locator('.learn-number.is-done')).toHaveCount(12)
+  await expect(page.getByText('Ya practicaste lo básico', { exact: false })).toBeVisible()
+  await expect(page.locator('.learn-mark.is-done')).toHaveCount(12)
 })
 
 test('the helper suggests a move and the learner can follow it', async ({ page }) => {
