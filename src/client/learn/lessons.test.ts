@@ -16,6 +16,13 @@ describe('lessons', () => {
         it(`${name}: the scripted hand is legal and reaches its goal`, () => {
           expect(() => runPlay(step.play)).not.toThrow()
         })
+      if (step.kind === 'play')
+        for (const [c, cue] of step.play.cues.entries())
+          for (const other of cue.or ?? [])
+            it(`${name}: cue ${c + 1} also works with the other move`, () => {
+              const cues = step.play.cues.map((x, j) => (j === c ? { ...x, expect: other } : x))
+              expect(() => runPlay({ ...step.play, cues })).not.toThrow()
+            })
       if (step.kind === 'count')
         it(`${name}: exactly one option is the real envido`, () => {
           const right = envidoPoints(step.hand)

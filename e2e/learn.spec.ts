@@ -27,13 +27,15 @@ test('a learner can go through every lesson', async ({ page }) => {
   test.setTimeout(120_000)
   await page.clock.install()
   await page.goto('/aprender')
+  await expect(page.getByText('Empezá por la primera, son 2 minutos.')).toBeVisible()
   await page.getByRole('button', { name: /De qué se trata/ }).click()
+  await expect(page.getByText('Lección 1', { exact: true })).toBeVisible()
 
   const finished = page.getByRole('heading', { name: '¡Lección terminada!' })
   const nextLesson = page.getByRole('button', { name: /^Seguir: / })
   for (let lessons = 0; lessons < 20; lessons++) {
     for (let i = 0; i < 80 && !(await finished.isVisible()); i++) {
-      const go = page.getByRole('button', { name: /^(Empezar|Seguir)$/ })
+      const go = page.locator('.lesson-actions .btn-primary, .feedback .btn-primary').first()
       const option = page.locator('.quiz-option, .quiz-card').first()
       const cue = page.locator('.suggested').first()
       if (await go.isVisible()) await go.click()
@@ -47,7 +49,7 @@ test('a learner can go through every lesson', async ({ page }) => {
   }
 
   await page.getByRole('button', { name: 'Volver al menú' }).click()
-  await expect(page.getByText('¡Terminaste todas las lecciones!')).toBeVisible()
+  await expect(page.getByText('¡Listo! Ya sabés jugar. Animate a una partida.')).toBeVisible()
   await expect(page.locator('.learn-number.is-done')).toHaveCount(9)
 })
 

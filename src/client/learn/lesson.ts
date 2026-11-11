@@ -21,6 +21,8 @@ export const RIVAL = 1
 export interface Cue {
   say: string
   expect: Action
+  /** Other moves that are just as good; tests take `expect`. */
+  or?: Action[]
 }
 
 /** A short hand on the real table, with the rival's moves and the learner's cues scripted. */
@@ -34,25 +36,49 @@ export interface Play {
   done: string
 }
 
+/** Fields every step can have. */
+interface Common {
+  /** Label of the button that moves on, when "Seguir" says too little. */
+  next?: string
+  /** A small reminder under the step, like where to find the quick guide. */
+  hint?: string
+}
+
+/** Fields of a question. */
+interface Question extends Common {
+  explain: string
+  /** Added to the explanation only when the answer was right. */
+  praise?: string
+}
+
 export type Step =
-  | {
+  | (Common & {
       kind: 'say'
       title: string
       text: string
       visual?: ReactNode
       /** Short items shown under the text, one per row: a name and what it means. */
       rows?: [string, string][]
-    }
-  | { kind: 'whichWins'; a: Card; b: Card; explain: string }
-  | { kind: 'count'; hand: Card[]; options: number[]; explain: string }
-  | { kind: 'choose'; prompt: string; options: string[]; answer: number; explain: string }
-  | { kind: 'play'; title: string; play: Play }
+    })
+  | (Question & { kind: 'whichWins'; a: Card; b: Card })
+  | (Question & { kind: 'count'; hand: Card[]; options: number[] })
+  | (Question & { kind: 'choose'; prompt: string; options: string[]; answer: number })
+  | (Common & { kind: 'play'; title: string; play: Play })
 
 export interface Lesson {
   id: string
   title: string
   summary: string
+  /** The opening screen: why the lesson is worth it. */
+  hook: string
+  /** Shown when the lesson ends: what the learner can do now and what comes next. */
+  outro: string
   steps: Step[]
+}
+
+/** Whether the learner may take this move at this cue. */
+export function cueAllows(cue: Cue, action: Action): boolean {
+  return [cue.expect, ...(cue.or ?? [])].some((a) => sameAction(a, action))
 }
 
 export function sameAction(a: Action, b: Action): boolean {
