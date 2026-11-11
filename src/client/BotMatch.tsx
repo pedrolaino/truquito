@@ -39,7 +39,7 @@ export function BotMatch({
   if (failed) throw new Error('The bot stopped working')
 
   return (
-    <>
+    <main className="screen">
       <Table
         key={game.id}
         view={viewFor(state, HUMAN)}
@@ -75,6 +75,6 @@ export function BotMatch({
           )
         }
       />
-    </>
+    </main>
   )
 }
