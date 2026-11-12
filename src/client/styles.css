@@ -2154,3 +2154,253 @@ button.card:disabled {
     transform: none;
   }
 }
+
+/* ---------- Learning on a computer ----------
+   Everything below only applies to wide screens; phones keep the layout above. */
+
+@media (min-width: 900px) {
+  /* The menu: what to do next on the left, the whole path on the right. */
+  .learn-hub {
+    max-width: 1180px;
+    display: grid;
+    grid-template-columns: minmax(300px, 380px) minmax(0, 1fr);
+    column-gap: 64px;
+    row-gap: 20px;
+    align-content: start;
+    padding-top: 48px;
+  }
+
+  .learn-hub > :not(.learn-path) {
+    grid-column: 1;
+  }
+
+  .learn-hub > .learn-path {
+    grid-column: 2;
+    grid-row: 1 / span 4;
+    display: block;
+    columns: 2;
+    column-gap: 32px;
+  }
+
+  .learn-hub > .btn-quiet {
+    justify-self: start;
+  }
+
+  .learn-stage {
+    break-inside: avoid;
+    padding-bottom: 20px;
+  }
+
+  .learn-more .btn {
+    flex-basis: 100%;
+  }
+
+  /* Lesson steps use the width: the picture on one side, the words and choices on the other. */
+  .lesson {
+    max-width: 1080px;
+  }
+
+  .lesson-bar {
+    padding-top: 20px;
+  }
+
+  .lesson-step {
+    justify-content: center;
+    padding: 24px var(--gutter) 48px;
+    max-width: 720px;
+    width: 100%;
+    margin: 0 auto;
+  }
+
+  .lesson-step:has(> .lesson-visual) {
+    max-width: none;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    column-gap: 64px;
+    align-content: center;
+  }
+
+  .lesson-step:has(> .lesson-visual) > * {
+    grid-column: 2;
+  }
+
+  .lesson-step:has(> .lesson-visual) > .lesson-visual {
+    grid-column: 1;
+    grid-row: 1 / span 8;
+    align-self: center;
+    min-height: 320px;
+  }
+
+  .lesson-step h1 {
+    font-size: 40px;
+  }
+
+  .lesson-text {
+    font-size: 21px;
+  }
+
+  .lesson-actions {
+    margin-top: 12px;
+    flex-direction: row;
+  }
+
+  .lesson-actions .btn {
+    min-width: 240px;
+  }
+
+  .lesson-cards .card {
+    --card-w: 110px;
+  }
+
+  .lesson-tricks .card {
+    --card-w: 76px;
+  }
+
+  .chain {
+    font-size: 20px;
+  }
+
+  /* Cards to choose from stay in one row, big. */
+  .quiz-cards {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 28px;
+  }
+
+  .quiz-cards .quiz-option {
+    flex-basis: 100%;
+    max-width: 420px;
+  }
+
+  /* Steps about the cards themselves read from the middle, like a table. */
+  .lesson-step:has(.quiz-cards, .order-slots, .pick-cards) {
+    text-align: center;
+  }
+
+  .lesson-step:has(.quiz-cards, .order-slots, .pick-cards) .feedback {
+    width: 100%;
+    max-width: 640px;
+    margin: 0 auto;
+    text-align: left;
+  }
+
+  .lesson-step:has(.pick-cards) .lesson-actions {
+    justify-content: center;
+  }
+
+  .quiz-card .card,
+  .pick-cards .card {
+    --card-w: clamp(96px, 18dvh, 140px);
+  }
+
+  .order-left .card {
+    --card-w: clamp(72px, 14dvh, 120px);
+  }
+
+  .order-slot .card,
+  .order-empty {
+    --card-w: clamp(60px, 11dvh, 96px);
+  }
+
+  .order-slots {
+    gap: 28px;
+  }
+
+  .order-left {
+    display: flex;
+  }
+
+  .feedback {
+    padding: 20px 24px;
+  }
+
+  .feedback .btn-primary {
+    align-self: flex-start;
+    min-width: 240px;
+  }
+
+  .lesson-done .lesson-actions {
+    flex-direction: column;
+    align-items: center;
+    max-width: 420px;
+  }
+
+  .lesson-done .lesson-actions .btn {
+    width: 100%;
+  }
+
+  /* A lesson's hand looks like a game: as wide as one, with bigger cards. */
+  .lesson.screen {
+    max-width: 1120px;
+  }
+
+  .lesson-play,
+  .helper {
+    --card-w: clamp(64px, 13dvh, 104px);
+    --card-table-w: clamp(40px, 9dvh, 72px);
+    --card-back-w: clamp(30px, 6dvh, 44px);
+  }
+
+  .lesson-play .tip,
+  .helper .tip {
+    font-size: 17px;
+    padding: 10px 16px;
+  }
+
+  .overlay-result {
+    place-items: end center;
+    padding-bottom: 32px;
+  }
+
+  /* The guide page: the ranking on one side, envido and calls on the other. */
+  .guide-page {
+    max-width: 1120px;
+  }
+
+  .guide-page .guide {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    column-gap: 48px;
+    row-gap: 28px;
+    align-items: start;
+  }
+
+  .guide-page .guide-nav {
+    grid-column: 1 / -1;
+  }
+
+  .guide-page .guide > .guide-section:nth-of-type(1) {
+    grid-column: 1;
+    grid-row: 2 / span 2;
+  }
+
+  .guide-page .guide > .guide-section:nth-of-type(n + 2) {
+    grid-column: 2;
+  }
+}
+
+/* Short laptop screens: a bit tighter so a question and its answer fit. */
+@media (min-width: 900px) and (max-height: 720px) {
+  .lesson-step {
+    gap: 12px;
+    padding-top: 8px;
+    padding-bottom: 16px;
+  }
+
+  .lesson-step h1 {
+    font-size: 32px;
+  }
+
+  .lesson-text {
+    font-size: 19px;
+  }
+
+  .quiz-option {
+    min-height: 46px;
+  }
+
+  .feedback {
+    padding: 14px 20px;
+  }
+}

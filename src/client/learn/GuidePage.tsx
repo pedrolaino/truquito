@@ -3,7 +3,7 @@ import { GuideContent } from './Guide.tsx'
 
 export function GuidePage({ navigate }: { navigate: (path: string) => void }) {
   return (
-    <main className="page">
+    <main className="page guide-page">
       <button type="button" className="back" onClick={() => navigate('/aprender')}>
         <ChevronLeft aria-hidden="true" /> Aprender
       </button>
