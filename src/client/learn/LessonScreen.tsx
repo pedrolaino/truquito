@@ -4,6 +4,7 @@ import {
   useCallback,
   useEffect,
   useMemo,
+  useRef,
   useState,
   useSyncExternalStore,
 } from 'react'
@@ -57,6 +58,7 @@ export function LessonScreen({
   onNext,
   onHelper,
 }: Props) {
+  const container = useRef<HTMLElement>(null)
   const [index, setIndex] = useState(0)
   const [guide, setGuide] = useState(false)
   const steps = lesson.steps.length
@@ -64,13 +66,21 @@ export function LessonScreen({
   useEffect(() => {
     if (finished) onFinish()
   }, [finished, onFinish])
+  useEffect(() => {
+    window.scrollTo(0, 0)
+    const heading =
+      container.current?.querySelector<HTMLElement>('.lesson-step h2') ??
+      container.current?.querySelector<HTMLElement>('.lesson-position h1')
+    heading?.setAttribute('tabindex', '-1')
+    heading?.focus({ preventScroll: true })
+  }, [index])
   const step = lesson.steps[index]
   const label = lesson.steps[index + 1]?.kind === 'play' ? 'Probar' : 'Seguir'
   const helperFirst = lesson.helperAfter || !next
 
   return (
     // A hand on the table takes exactly one screen, like any game.
-    <main className={step?.kind === 'play' ? 'lesson screen' : 'lesson'}>
+    <main ref={container} className={step?.kind === 'play' ? 'lesson screen' : 'lesson'}>
       <header className="lesson-bar">
         <button
           type="button"
@@ -80,15 +90,23 @@ export function LessonScreen({
         >
           <X aria-hidden="true" />
         </button>
-        <div
-          className="lesson-progress"
-          role="progressbar"
-          aria-label={`Avance de ${lesson.title}`}
-          aria-valuemin={0}
-          aria-valuemax={steps}
-          aria-valuenow={Math.min(index, steps)}
-        >
-          <span style={{ width: `${(Math.min(index, steps) / steps) * 100}%` }} />
+        <div className="lesson-position">
+          <div className="lesson-position-title">
+            <h1 data-page-title={lesson.title}>{lesson.title}</h1>
+            <small>
+              {Math.min(index + 1, steps)} de {steps}
+            </small>
+          </div>
+          <div
+            className="lesson-progress"
+            role="progressbar"
+            aria-label={`Avance de ${lesson.title}`}
+            aria-valuemin={0}
+            aria-valuemax={steps}
+            aria-valuenow={Math.min(index, steps)}
+          >
+            <span style={{ transform: `scaleX(${Math.min(index, steps) / steps})` }} />
+          </div>
         </div>
         <button
           type="button"
@@ -107,7 +125,7 @@ export function LessonScreen({
           <span className="done-check" aria-hidden="true">
             <Check />
           </span>
-          <h1 id="lesson-done">¡Lección terminada!</h1>
+          <h2 id="lesson-done">¡Lección terminada!</h2>
           <p className="lesson-text">{lesson.outro}</p>
           {!lesson.optional && (
             <div className="done-progress">
@@ -162,7 +180,7 @@ function StepView({ step, label, onDone }: StepProps) {
       return (
         <section className="lesson-step" aria-labelledby="step-title">
           {step.visual && <div className="lesson-visual">{step.visual}</div>}
-          <h1 id="step-title">{step.title}</h1>
+          <h2 id="step-title">{step.title}</h2>
           <p className="lesson-text">{step.text}</p>
           {step.rows && (
             <dl className="lesson-rows">
@@ -182,7 +200,7 @@ function StepView({ step, label, onDone }: StepProps) {
           )}
           <Hint text={step.hint} />
           <div className="lesson-actions">
-            <button type="button" className="btn btn-primary" onClick={onDone} autoFocus>
+            <button type="button" className="btn btn-primary" onClick={onDone}>
               {label}
             </button>
           </div>
@@ -342,7 +360,7 @@ function Quiz({
           {typeof visual === 'function' ? visual(result !== null) : visual}
         </div>
       )}
-      <h1 id="quiz-prompt">{prompt}</h1>
+      <h2 id="quiz-prompt">{prompt}</h2>
       {!result && wrong.length === 0 && <Hint text={step.hint} />}
       <div className={options.some((o) => o.card) ? 'quiz-options quiz-cards' : 'quiz-options'}>
         {options.map((o) => (
@@ -424,7 +442,7 @@ function OrderStep({
 
   return (
     <section className="lesson-step" aria-labelledby="order-prompt">
-      <h1 id="order-prompt">Ordenalas de la más fuerte a la más débil</h1>
+      <h2 id="order-prompt">Ordenalas de la más fuerte a la más débil</h2>
       {placed.length === 0 && !miss && <Hint text={step.hint ?? 'Tocá primero la más fuerte.'} />}
       <ol className="order-slots" aria-label="Tu orden">
         {step.cards.map((_, i) => (
@@ -534,7 +552,7 @@ function CountStep({
 
   return (
     <section className="lesson-step" aria-labelledby="pick-prompt">
-      <h1 id="pick-prompt">¿Qué cartas cuentan para el envido?</h1>
+      <h2 id="pick-prompt">¿Qué cartas cuentan para el envido?</h2>
       <p className="lesson-hint">Tocá las que cuentan y después Listo.</p>
       <div className="lesson-cards pick-cards">
         {step.hand.map((card) => {

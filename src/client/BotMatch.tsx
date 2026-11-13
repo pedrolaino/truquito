@@ -42,6 +42,7 @@ export function BotMatch({
 
   return (
     <main className="screen">
+      <h1 className="sr-only">Contra el bot</h1>
       <Table
         key={game.id}
         view={viewFor(state, HUMAN)}

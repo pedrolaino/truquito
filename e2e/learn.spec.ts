@@ -2,8 +2,8 @@ import { expect, test } from '@playwright/test'
 
 test('the quick guide opens from the menu and over a game', async ({ page }) => {
   await page.goto('/')
-  await page.getByRole('button', { name: /No sabés jugar/ }).click()
-  await page.getByRole('button', { name: 'Consultar las reglas' }).click()
+  await page.getByRole('link', { name: 'Aprender a jugar' }).click()
+  await page.getByRole('link', { name: 'Consultar las reglas' }).click()
   await expect(page.getByRole('heading', { name: 'Qué carta gana' })).toBeVisible()
   await expect(page.getByRole('heading', { level: 2 })).toHaveText([
     'Qué carta gana',
@@ -23,11 +23,13 @@ test('the quick guide opens from the menu and over a game', async ({ page }) => 
   await expect(page.getByRole('region', { name: 'Mesa' })).toBeVisible()
 })
 
-test('a learner can go through every lesson', async ({ page }) => {
+test('a learner can go through every lesson', async ({ page }, testInfo) => {
   test.setTimeout(300_000)
+  if (testInfo.project.name === 'mobile') await page.setViewportSize({ width: 375, height: 553 })
+  await page.emulateMedia({ reducedMotion: 'reduce' })
   await page.clock.install()
   await page.goto('/aprender')
-  await page.getByRole('button', { name: 'Jugar mi primera mano' }).click()
+  await page.getByRole('link', { name: 'Jugar mi primera mano' }).click()
 
   const finished = page.getByRole('heading', { name: '¡Lección terminada!' })
   const nextLesson = page.getByRole('button', { name: /^Continuar: / })
@@ -42,6 +44,22 @@ test('a learner can go through every lesson', async ({ page }) => {
   ]
   for (let lessons = 0; lessons < 20; lessons++) {
     for (let i = 0; i < 120 && !(await finished.isVisible()); i++) {
+      const clipped = await page.locator('.screen .hand button, .screen .calls button').evaluateAll(
+        (controls, viewport) =>
+          controls
+            .filter((control) => {
+              const rect = control.getBoundingClientRect()
+              return (
+                rect.left < -1 ||
+                rect.right > viewport.width + 1 ||
+                rect.top < -1 ||
+                rect.bottom > viewport.height + 1
+              )
+            })
+            .map((control) => control.getAttribute('aria-label') || control.textContent),
+        page.viewportSize()!,
+      )
+      expect(clipped).toEqual([])
       for (const tap of taps) {
         const target = tap.first()
         if (await target.isVisible()) {

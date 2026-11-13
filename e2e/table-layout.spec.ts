@@ -70,7 +70,11 @@ test('a long rival name leaves cards and both scores visible', async ({
     const link = a.getByLabel('Link de la sala')
     await expect(link).toBeVisible()
     await b.goto(await link.inputValue())
+    await b.getByRole('button', { name: 'Entrar', exact: true }).click()
+    await expect(b.getByLabel('Tu nombre')).toBeFocused()
+    await expect(b.getByLabel('Tu nombre')).toHaveAttribute('aria-invalid', 'true')
     await b.getByLabel('Tu nombre').fill('WWWWWWWWWWWWWWWWWWWW')
+    await expect(b.getByLabel('Tu nombre')).toHaveAttribute('aria-invalid', 'false')
     await b.getByRole('button', { name: 'Entrar', exact: true }).click()
     await expect(a.getByRole('region', { name: 'Mesa' })).toBeVisible()
     for (const selector of ['.rival-hand', '.score-me small', '.score-rival small']) {

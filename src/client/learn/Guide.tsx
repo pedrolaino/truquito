@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { type Card, cardPower, createDeck, envidoPoints } from '../../engine/cards.ts'
+import { Link } from '../Link.tsx'
 import { CardView } from '../Card.tsx'
 import { cardName } from '../text.ts'
 
@@ -25,7 +26,7 @@ function levelName(cards: Card[]): string {
   return `Los ${cards[0]!.rank}`
 }
 
-function Ranking() {
+function Ranking({ practice = false }: { practice?: boolean }) {
   const [large, setLarge] = useState(false)
   return (
     <section className="guide-section" aria-labelledby="guide-cartas">
@@ -56,6 +57,11 @@ function Ranking() {
           </li>
         ))}
       </ol>
+      {practice && (
+        <Link className="btn btn-quiet" href="/aprender/cartas">
+          Probar: qué carta gana
+        </Link>
+      )}
     </section>
   )
 }
@@ -69,7 +75,7 @@ const CALLS: [string, string, string][] = [
   ['Falta envido', 'Lo que le falta al que va ganando', 'Lo que había antes, o 1'],
 ]
 
-function Calls() {
+function Calls({ practice = false }: { practice?: boolean }) {
   return (
     <section className="guide-section" aria-labelledby="guide-cantos">
       <h2 id="guide-cantos">Cuánto vale cada canto</h2>
@@ -103,6 +109,11 @@ function Calls() {
         <strong>Regla de esta mesa:</strong> al 4 no se le canta truco. Si el rival tiró un 4, el
         truco espera hasta que tires tu carta.
       </p>
+      {practice && (
+        <Link className="btn btn-quiet" href="/aprender/truco">
+          Probar: cantar truco
+        </Link>
+      )}
     </section>
   )
 }
@@ -123,7 +134,7 @@ const ENVIDO_EXAMPLES: { hand: Card[]; why: string }[] = [
   { hand: [c(10, 'espada'), c(11, 'copa'), c(12, 'basto')], why: 'Tres negras: 0' },
 ]
 
-function Envido() {
+function Envido({ practice = false }: { practice?: boolean }) {
   return (
     <section className="guide-section" aria-labelledby="guide-envido">
       <h2 id="guide-envido">Cómo se cuenta el envido</h2>
@@ -145,6 +156,11 @@ function Envido() {
           </li>
         ))}
       </ul>
+      {practice && (
+        <Link className="btn btn-quiet" href="/aprender/contar-envido">
+          Probar: contar el envido
+        </Link>
+      )}
     </section>
   )
 }
@@ -202,9 +218,9 @@ export function GuideContent({
           </a>
         ))}
       </nav>
-      <Ranking />
-      <Envido />
-      <Calls />
+      <Ranking practice={page} />
+      <Envido practice={page} />
+      <Calls practice={page} />
     </div>
   )
 }

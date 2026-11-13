@@ -1,3 +1,4 @@
+import { Link } from './Link.tsx'
 import { House, Minus } from 'lucide-react'
 import { useState } from 'react'
 import { Fosforos } from './Fosforos.tsx'
@@ -19,7 +20,7 @@ const TEAMS = ['Nosotros', 'Ellos'] as const
 type Team = 0 | 1
 
 /** Score counter for a game played with real cards. */
-export function Scorekeeper({ onExit }: { onExit: () => void }) {
+export function Scorekeeper() {
   const [resetting, setResetting] = useState(false)
   const [tally, setTally] = useState<Tally | null>(savedTally)
   const [lastPuntas, setLastPuntas] = useState<string | null>(null)
@@ -48,9 +49,9 @@ export function Scorekeeper({ onExit }: { onExit: () => void }) {
             </button>
           </div>
         </div>
-        <button type="button" className="btn btn-quiet" onClick={onExit}>
+        <Link className="btn btn-quiet" href="/">
           <House aria-hidden="true" /> Volver al inicio
-        </button>
+        </Link>
       </main>
     )
 
@@ -120,9 +121,9 @@ export function Scorekeeper({ onExit }: { onExit: () => void }) {
           >
             Nueva partida
           </button>
-          <button type="button" className="btn btn-quiet" onClick={onExit}>
+          <Link className="btn btn-quiet" href="/">
             <House aria-hidden="true" /> Inicio
-          </button>
+          </Link>
         </div>
       </main>
       {resetting && (

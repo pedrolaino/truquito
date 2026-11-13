@@ -2,7 +2,7 @@ import { expect, test } from '@playwright/test'
 
 test('keeps the score of a real game and survives a reload', async ({ page }) => {
   await page.goto('/')
-  await page.getByRole('button', { name: 'Abrir el anotador' }).click()
+  await page.getByRole('link', { name: 'Abrir el anotador' }).click()
   await page.getByRole('button', { name: 'A 30' }).click()
 
   const nosotros = page.getByRole('button', { name: 'Sumar un punto a Nosotros' })
