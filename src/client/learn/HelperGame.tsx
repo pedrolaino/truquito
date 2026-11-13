@@ -5,6 +5,8 @@ import { type Action, actorOf, legalActions, nextSeat, viewFor } from '../../eng
 import { BOT, BotGame, HUMAN } from '../botGame.ts'
 import { decideInWorker } from '../decide.ts'
 import { GameOver } from '../GameOver.tsx'
+import { ConfirmDialog } from '../ConfirmDialog.tsx'
+import { Modal } from '../Modal.tsx'
 import { Table } from '../Table.tsx'
 import { type Topic, advise, reviewRound } from './coach.ts'
 import { sameAction } from './lesson.ts'
@@ -53,6 +55,7 @@ interface Props {
 
 /** A real game against the easy bot with a coach that suggests moves and says why. */
 export function HelperGame({ onExit, onPractice }: Props) {
+  const [exiting, setExiting] = useState(false)
   const [game, setGame] = useState(newGame)
   useEffect(() => () => game.dispose(), [game])
   const { state, events, failed } = useSyncExternalStore(game.subscribe, game.getSnapshot)
@@ -88,13 +91,9 @@ export function HelperGame({ onExit, onPractice }: Props) {
     help === 'off' ? undefined : shown ? (
       <>
         <span>{shown.say}</span>{' '}
-        {now.why ? (
-          <span className="tip-why">{shown.why}</span>
-        ) : (
-          <button type="button" className="tip-btn" onClick={() => setAsked({ ...now, why: true })}>
-            ¿Por qué?
-          </button>
-        )}
+        <button type="button" className="tip-btn" onClick={() => setAsked({ ...now, why: true })}>
+          ¿Por qué?
+        </button>
       </>
     ) : advice ? (
       <>
@@ -121,7 +120,12 @@ export function HelperGame({ onExit, onPractice }: Props) {
   return (
     <main className="helper screen">
       <header className="helper-bar">
-        <button type="button" className="icon-btn" aria-label="Volver a Aprender" onClick={onExit}>
+        <button
+          type="button"
+          className="icon-btn"
+          aria-label="Volver a Aprender"
+          onClick={() => setExiting(true)}
+        >
           <ChevronLeft aria-hidden="true" />
         </button>
         <h1>Partida con ayudante</h1>
@@ -181,6 +185,32 @@ export function HelperGame({ onExit, onPractice }: Props) {
           )
         }
       />
+      {now.why && shown && (
+        <Modal titleId="advice-title" onClose={() => setAsked({ ...now, why: false })}>
+          <section className="panel">
+            <h2 id="advice-title" tabIndex={-1}>
+              {shown.say}
+            </h2>
+            <p>{shown.why}</p>
+            <button
+              type="button"
+              className="btn btn-primary"
+              onClick={() => setAsked({ ...now, why: false })}
+            >
+              Seguir
+            </button>
+          </section>
+        </Modal>
+      )}
+      {exiting && (
+        <ConfirmDialog
+          title="¿Volver a Aprender?"
+          detail="Esta partida de práctica no se guarda. Las lecciones terminadas sí."
+          confirm="Volver a Aprender"
+          onCancel={() => setExiting(false)}
+          onConfirm={onExit}
+        />
+      )}
     </main>
   )
 }

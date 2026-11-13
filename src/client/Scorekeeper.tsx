@@ -1,6 +1,7 @@
 import { House, Minus } from 'lucide-react'
 import { useState } from 'react'
 import { Fosforos } from './Fosforos.tsx'
+import { ConfirmDialog } from './ConfirmDialog.tsx'
 import { Puntas } from './Puntas.tsx'
 import { saveTally, savedTally } from './storage.ts'
 import {
@@ -19,6 +20,7 @@ type Team = 0 | 1
 
 /** Score counter for a game played with real cards. */
 export function Scorekeeper({ onExit }: { onExit: () => void }) {
+  const [resetting, setResetting] = useState(false)
   const [tally, setTally] = useState<Tally | null>(savedTally)
   const [lastPuntas, setLastPuntas] = useState<string | null>(null)
   const update = (next: Tally | null) => {
@@ -109,7 +111,13 @@ export function Scorekeeper({ onExit }: { onExit: () => void }) {
           >
             Jugar puntas
           </button>
-          <button type="button" className="btn" onClick={() => update(null)}>
+          <button
+            type="button"
+            className="btn"
+            onClick={() =>
+              tally.points.some((points) => points > 0) ? setResetting(true) : update(null)
+            }
+          >
             Nueva partida
           </button>
           <button type="button" className="btn btn-quiet" onClick={onExit}>
@@ -117,6 +125,18 @@ export function Scorekeeper({ onExit }: { onExit: () => void }) {
           </button>
         </div>
       </main>
+      {resetting && (
+        <ConfirmDialog
+          title="¿Empezar de nuevo?"
+          detail="Se van a borrar los puntos de esta partida."
+          confirm="Nueva partida"
+          onCancel={() => setResetting(false)}
+          onConfirm={() => {
+            setResetting(false)
+            update(null)
+          }}
+        />
+      )}
       {tally.puntas && (
         <Puntas
           tally={tally}

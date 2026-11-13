@@ -13,6 +13,7 @@ Argentine truco in the browser, against a bot or one on one with a friend throug
 
 - Play against a bot on easy, medium or hard. Bot games run in your browser.
 - Play online 1 on 1: create a room, send the link, and the game starts when your friend joins. Players only need a name.
+- The table adapts to portrait and landscape screens. Tap the hand number to see recent plays, and keep the current hand value beside the scores. Leaving a local game or clearing the scorekeeper asks for confirmation.
 - If your connection drops, reopening the link gives you your seat back. Your opponent sees that you are away and wins by abandonment after two minutes.
 - Both players can ask for a rematch in the same room.
 - Each room is played with or without flor, to 15 or 30 points. At 30 the score reads as _malas_ and _buenas_.
