@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { type Card, cardPower, createDeck, envidoPoints } from '../../engine/cards.ts'
 import { CardView } from '../Card.tsx'
 import { cardName } from '../text.ts'
@@ -26,13 +26,22 @@ function levelName(cards: Card[]): string {
 }
 
 function Ranking() {
+  const [large, setLarge] = useState(false)
   return (
     <section className="guide-section" aria-labelledby="guide-cartas">
       <h2 id="guide-cartas">Qué carta gana</h2>
       <p className="guide-note">
         De la que más mata a la que menos. Las de una misma fila empatan.
       </p>
-      <ol className="ranking">
+      <button
+        type="button"
+        className="btn btn-quiet ranking-size"
+        aria-pressed={large}
+        onClick={() => setLarge(!large)}
+      >
+        {large ? 'Reducir cartas' : 'Ampliar cartas'}
+      </button>
+      <ol className={large ? 'ranking ranking-large' : 'ranking'}>
         {LEVELS.map((cards, i) => (
           <li key={i} className="ranking-level">
             <span className="ranking-place" aria-hidden="true">
@@ -149,23 +158,48 @@ const SECTIONS: [GuideSection, string][] = [
 ]
 
 /** Quick reference: card ranking, envido counting and call values. Opens at `section`. */
-export function GuideContent({ section }: { section?: GuideSection }) {
+export function GuideContent({
+  section,
+  page = false,
+}: {
+  section?: GuideSection
+  page?: boolean
+}) {
+  const [active, setActive] = useState<GuideSection>(() => {
+    const hash = page ? location.hash.replace('#guide-', '') : ''
+    return section ?? SECTIONS.find(([id]) => id === hash)?.[0] ?? 'cartas'
+  })
   const root = useRef<HTMLDivElement>(null)
-  const go = (id: GuideSection, smooth = true) =>
-    root.current
-      ?.querySelector(`#guide-${id}`)
-      ?.scrollIntoView({ block: 'start', behavior: smooth ? 'smooth' : 'auto' })
+  const go = (id: GuideSection, smooth = true) => {
+    root.current?.querySelector(`#guide-${id}`)?.scrollIntoView({
+      block: 'start',
+      behavior:
+        smooth && !matchMedia('(prefers-reduced-motion: reduce)').matches ? 'smooth' : 'auto',
+    })
+  }
   useEffect(() => {
-    if (section) go(section, false)
-  }, [section])
+    const id = section ?? (page ? location.hash.replace('#guide-', '') : '')
+    if (SECTIONS.some(([key]) => key === id)) go(id as GuideSection, false)
+  }, [section, page])
 
   return (
     <div className="guide" ref={root}>
       <nav className="guide-nav" aria-label="Secciones de la guía">
         {SECTIONS.map(([id, label]) => (
-          <button key={id} type="button" className="btn btn-quiet" onClick={() => go(id)}>
+          <a
+            key={id}
+            href={`#guide-${id}`}
+            className="btn btn-quiet"
+            aria-current={active === id ? 'location' : undefined}
+            onClick={(event) => {
+              event.preventDefault()
+              if (page) history.replaceState(null, '', `#guide-${id}`)
+              setActive(id)
+              go(id)
+            }}
+          >
             {label}
-          </button>
+          </a>
         ))}
       </nav>
       <Ranking />

@@ -8,7 +8,7 @@ export function GuidePage({ navigate }: { navigate: (path: string) => void }) {
         <ChevronLeft aria-hidden="true" /> Aprender
       </button>
       <h1 className="page-title">Guía rápida</h1>
-      <GuideContent />
+      <GuideContent page />
     </main>
   )
 }

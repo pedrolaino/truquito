@@ -1273,30 +1273,88 @@ button.card:disabled {
   line-height: 1;
 }
 
-.sheet-overlay {
-  place-items: end center;
-  padding: 0;
+.modal-frame {
+  position: fixed;
+  inset: 0;
+  margin: 0;
+  width: 100%;
+  height: 100dvh;
+  max-width: none;
+  max-height: none;
+  padding: var(--gutter);
+  border: 0;
+  color: var(--ink);
+  background: transparent;
 }
 
-.overlay .sheet {
-  max-width: 600px;
-  max-height: 88dvh;
+.modal-frame[open] {
+  display: grid;
+  place-items: center;
+}
+
+.modal-frame::backdrop {
+  background: rgb(27 42 65 / 0.45);
+}
+
+.modal-frame > .panel {
+  width: 100%;
+  max-width: 440px;
+  max-height: 100%;
   overflow: auto;
+  overscroll-behavior: contain;
+}
+
+.guide-modal[open] {
+  padding: 0;
+  place-items: end center;
+}
+
+.guide-modal > .sheet {
+  max-width: 600px;
+  height: 88dvh;
+  padding: 0;
+  gap: 0;
+  overflow: hidden;
   border-radius: var(--radius) var(--radius) 0 0;
   box-shadow: none;
 }
 
 .sheet-head {
-  position: sticky;
-  top: -18px;
-  margin: -18px -18px 0;
-  padding: 14px 18px;
-  background: var(--card);
+  flex: none;
+  padding: 12px 18px;
   border-bottom: 1.5px solid var(--line);
   display: flex;
   align-items: center;
   justify-content: space-between;
-  z-index: 1;
+}
+
+.sheet-body {
+  min-height: 0;
+  overflow: auto;
+  overscroll-behavior: contain;
+  padding: 0 18px max(18px, env(safe-area-inset-bottom));
+}
+
+.guide-nav [aria-current] {
+  background: var(--ink);
+  border-color: var(--ink);
+  color: var(--card);
+}
+
+.ranking-size {
+  align-self: flex-start;
+}
+.ranking-large .ranking-level {
+  grid-template-columns: 24px 1fr;
+  row-gap: 12px;
+}
+.ranking-large .ranking-cards {
+  grid-column: 1 / -1;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+.ranking-large .card {
+  --card-w: 60px;
 }
 
 .icon-btn,

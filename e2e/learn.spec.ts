@@ -77,3 +77,38 @@ test('the helper suggests a move and the learner can follow it', async ({ page }
   await expect(coach).toHaveCount(0)
   await expect(page.locator('.suggested')).toHaveCount(0)
 })
+
+test('the guide keeps its close button reachable and isolates the table', async ({ page }) => {
+  await page.goto('/aprender/objetivo')
+  const trigger = page.getByRole('button', { name: 'Guía rápida' })
+  await trigger.click()
+  const dialog = page.getByRole('dialog', { name: 'Guía rápida' })
+  const hand = page.locator('.hand button')
+  const count = await hand.count()
+  for (let i = 0; i < 8; i++) {
+    await page.keyboard.press('Shift+Tab')
+    expect(await page.locator(':focus').count()).toBe(await dialog.locator(':focus').count())
+  }
+  await dialog.getByRole('link', { name: 'Cantos', exact: true }).click()
+  await dialog.getByRole('button', { name: 'Cerrar la guía' }).click()
+  await expect(dialog).toHaveCount(0)
+  await expect(trigger).toBeFocused()
+  await expect(hand).toHaveCount(count)
+  await trigger.click()
+  await page.keyboard.press('Escape')
+  await expect(trigger).toBeFocused()
+})
+
+test('guide sections can be linked and enlarged without motion', async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: 'reduce' })
+  await page.goto('/aprender/guia#guide-envido')
+  await expect(page.getByRole('link', { name: 'Envido', exact: true })).toHaveAttribute(
+    'aria-current',
+    'location',
+  )
+  await page.getByRole('link', { name: 'Cantos', exact: true }).click()
+  await expect(page).toHaveURL(/#guide-cantos$/)
+  await page.getByRole('link', { name: 'Cartas', exact: true }).click()
+  await page.getByRole('button', { name: 'Ampliar cartas' }).click()
+  await expect(page.locator('.ranking')).toHaveClass(/ranking-large/)
+})
