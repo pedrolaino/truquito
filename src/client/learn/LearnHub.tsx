@@ -1,5 +1,6 @@
 import { BookOpen, Check, ChevronRight, House, Lightbulb } from 'lucide-react'
 import { useState } from 'react'
+import { Link } from '../Link.tsx'
 import { Fosforos } from '../Fosforos.tsx'
 import type { Lesson } from './lesson.ts'
 import { STAGES } from './lessons.tsx'
@@ -9,13 +10,12 @@ interface Props {
   done: Set<string>
   /** When the last lesson was finished, 0 if never. */
   lastTime: number
-  navigate: (path: string) => void
 }
 
 const DAY = 24 * 60 * 60 * 1000
 
 /** Entry point for learning: one next activity up top, then the whole path by stages. */
-export function LearnHub({ lessons, done, lastTime, navigate }: Props) {
+export function LearnHub({ lessons, done, lastTime }: Props) {
   const required = lessons.filter((l) => !l.optional)
   const next = required.find((l) => !done.has(l.id))
   const count = required.filter((l) => done.has(l.id)).length
@@ -36,33 +36,24 @@ export function LearnHub({ lessons, done, lastTime, navigate }: Props) {
               ? `Sigue: ${next.title}.`
               : 'Ya practicaste lo básico. Probalo en una partida con ayudante.'}
         </p>
-        <button
-          type="button"
+        <Link
           className="btn btn-primary learn-start"
-          onClick={() => navigate(next ? `/aprender/${next.id}` : '/aprender/ayudante')}
+          href={next ? `/aprender/${next.id}` : '/aprender/ayudante'}
         >
           {count === 0
             ? 'Jugar mi primera mano'
             : next
               ? 'Continuar aprendiendo'
               : 'Jugar una partida con ayudante'}
-        </button>
+        </Link>
         <div className="learn-more">
-          <button
-            type="button"
-            className="btn btn-quiet"
-            onClick={() => navigate('/aprender/guia')}
-          >
+          <Link className="btn btn-quiet" href="/aprender/guia">
             <BookOpen aria-hidden="true" /> Consultar las reglas
-          </button>
+          </Link>
           {next && (
-            <button
-              type="button"
-              className="btn btn-quiet"
-              onClick={() => navigate('/aprender/ayudante')}
-            >
+            <Link className="btn btn-quiet" href="/aprender/ayudante">
               <Lightbulb aria-hidden="true" /> Partida con ayudante
-            </button>
+            </Link>
           )}
         </div>
       </section>
@@ -91,10 +82,9 @@ export function LearnHub({ lessons, done, lastTime, navigate }: Props) {
                   const finished = done.has(lesson.id)
                   return (
                     <li key={lesson.id}>
-                      <button
-                        type="button"
+                      <Link
                         className={lesson === next ? 'learn-row is-next' : 'learn-row'}
-                        onClick={() => navigate(`/aprender/${lesson.id}`)}
+                        href={`/aprender/${lesson.id}`}
                       >
                         <span
                           className={finished ? 'learn-mark is-done' : 'learn-mark'}
@@ -110,7 +100,7 @@ export function LearnHub({ lessons, done, lastTime, navigate }: Props) {
                           </span>
                         </span>
                         <ChevronRight aria-hidden="true" />
-                      </button>
+                      </Link>
                     </li>
                   )
                 })}
@@ -119,9 +109,9 @@ export function LearnHub({ lessons, done, lastTime, navigate }: Props) {
         ))}
       </nav>
 
-      <button type="button" className="btn btn-quiet" onClick={() => navigate('/')}>
+      <Link className="btn btn-quiet" href="/">
         <House aria-hidden="true" /> Volver al inicio
-      </button>
+      </Link>
     </main>
   )
 }

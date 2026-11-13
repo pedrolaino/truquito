@@ -1,12 +1,13 @@
 import { ChevronLeft } from 'lucide-react'
+import { Link } from '../Link.tsx'
 import { GuideContent } from './Guide.tsx'
 
-export function GuidePage({ navigate }: { navigate: (path: string) => void }) {
+export function GuidePage() {
   return (
     <main className="page guide-page">
-      <button type="button" className="back" onClick={() => navigate('/aprender')}>
+      <Link className="back" href="/aprender">
         <ChevronLeft aria-hidden="true" /> Aprender
-      </button>
+      </Link>
       <h1 className="page-title">Guía rápida</h1>
       <GuideContent page />
     </main>

@@ -11,7 +11,7 @@ Argentine truco in the browser, against a bot or one on one with a friend throug
 
 ## Features
 
-- Play against a bot on easy, medium or hard. Bot games run in your browser.
+- Play against a bot on easy, medium or hard. Bot games run in your browser and need no name. The home page puts local play first, with the online name field kept beside room creation.
 - Play online 1 on 1: create a room, send the link, and the game starts when your friend joins. Players only need a name.
 - The table adapts to portrait and landscape screens. Tap the hand number to see recent plays, and keep the current hand value beside the scores. Leaving a local game or clearing the scorekeeper asks for confirmation.
 - If your connection drops, reopening the link gives you your seat back. Your opponent sees that you are away and wins by abandonment after two minutes.
@@ -19,7 +19,7 @@ Argentine truco in the browser, against a bot or one on one with a friend throug
 - Each room is played with or without flor, to 15 or 30 points. At 30 the score reads as _malas_ and _buenas_.
 - The scorekeeper keeps the score of a game with real cards: tap _Nosotros_ or _Ellos_ to add a point. It draws the score with matchsticks, four in a square and a fifth across it, the way Argentine players keep score.
 - For _puntas_, a popup over the scorekeeper counts each team's points on their own; when you finish, the difference goes to the team that made more.
-- New to truco? _Aprender a jugar_ has a quick guide (the card ranking, how to count envido and what each call is worth, with a jump to each part), a path of eleven short lessons in five stages (plus an optional one on the flor) where you play hands, make your own choices with a hint when you want one, and get another try when an answer is wrong, and a practice game against the easy bot with a coach: it suggests moves always, only when asked, or never, says why when asked, and reviews one card choice after each hand. The guide is also one tap away during any game, with keyboard focus kept inside it, direct links to its sections on the guide page, and a larger view of the cards.
+- New to truco? _Aprender a jugar_ has a quick guide (the card ranking, how to count envido and what each call is worth, with a jump to each part), a path of eleven short lessons in five stages (plus an optional one on the flor) where you play hands, make your own choices with a hint when you want one, and get another try when an answer is wrong, and a practice game against the easy bot with a coach: it suggests moves always, only when asked, or never, says why when asked, and reviews one card choice after each hand. The guide is also one tap away during any game, with keyboard focus kept inside it, direct links to its sections on the guide page, and a larger view of the cards. Each guide topic links to a practice lesson. Lessons keep their name and step number visible, and keyboard focus follows each new question.
 - The layout is designed for phones first. You can play with a keyboard, screen readers announce every call and card, and the animations switch off when your system asks for reduced motion.
 
 ![The game table on a laptop, with the play log on the side](docs/images/desktop.png)

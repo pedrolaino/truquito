@@ -16,7 +16,7 @@ export function GameOver({ won, detail, names, scores, target, children }: Props
   useEffect(() => heading.current?.focus(), [])
   return (
     <div className="overlay">
-      <section className="panel" aria-labelledby="game-over" aria-modal="false">
+      <section className="panel" aria-labelledby="game-over">
         <h2 id="game-over" className="result-title" ref={heading} tabIndex={-1}>
           {won ? '¡Ganaste!' : 'Perdiste'}
         </h2>

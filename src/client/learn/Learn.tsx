@@ -26,7 +26,7 @@ export function Learn({ path, navigate }: { path: string; navigate: (path: strin
     })
   }, [lesson])
 
-  if (id === 'guia') return <GuidePage navigate={navigate} />
+  if (id === 'guia') return <GuidePage />
   if (id === 'ayudante')
     return (
       <HelperGame
@@ -34,10 +34,7 @@ export function Learn({ path, navigate }: { path: string; navigate: (path: strin
         onPractice={(lesson) => navigate(`/aprender/${lesson}`)}
       />
     )
-  if (!lesson)
-    return (
-      <LearnHub lessons={LESSONS} done={done} lastTime={savedLessonTime()} navigate={navigate} />
-    )
+  if (!lesson) return <LearnHub lessons={LESSONS} done={done} lastTime={savedLessonTime()} />
   const next = LESSONS[index + 1] ?? null
   const required = LESSONS.filter((l) => !l.optional)
   const doneRequired = required.filter((l) => done.has(l.id) || l === lesson).length

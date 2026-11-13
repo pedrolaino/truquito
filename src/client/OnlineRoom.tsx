@@ -1,8 +1,9 @@
-import { type FormEvent, type ReactNode, useEffect, useState } from 'react'
+import { type FormEvent, type ReactNode, useEffect, useRef, useState } from 'react'
 import { Check, Copy, Hourglass, House, Share2, Swords, WifiOff } from 'lucide-react'
 import { nextSeat } from '../engine/game.ts'
 import type { RoomSnapshot } from '../shared/protocol.ts'
 import { cleanName } from '../shared/protocol.ts'
+import { Link } from './Link.tsx'
 import { GameOver } from './GameOver.tsx'
 import { saveName, savedName } from './storage.ts'
 import { Table } from './Table.tsx'
@@ -10,22 +11,23 @@ import { useRoom } from './useRoom.ts'
 
 interface Props {
   roomId: string
-  navigate: (path: string) => void
 }
 
-export function OnlineRoom({ roomId, navigate }: Props) {
+export function OnlineRoom({ roomId }: Props) {
   const room = useRoom(roomId)
   const home = (
-    <button type="button" className="btn btn-quiet" onClick={() => navigate('/')}>
+    <Link className="btn btn-quiet" href="/">
       <House aria-hidden="true" /> Volver al inicio
-    </button>
+    </Link>
   )
 
   if (!room.token) {
     const { lobby } = room
     return (
       <main className="page">
-        <h1 className="page-title">Truquito</h1>
+        <h1 className="page-title" data-page-title="Sala online">
+          Truquito
+        </h1>
         {lobby.kind === 'loading' && <p role="status">Cargando la sala…</p>}
         {lobby.kind === 'missing' && (
           <p role="alert" className="alert">
@@ -59,7 +61,9 @@ export function OnlineRoom({ roomId, navigate }: Props) {
   if (!snapshot)
     return (
       <main className="page">
-        <h1 className="page-title">Truquito</h1>
+        <h1 className="page-title" data-page-title="Sala online">
+          Truquito
+        </h1>
         <p role="status">Conectando…</p>
       </main>
     )
@@ -71,6 +75,7 @@ export function OnlineRoom({ roomId, navigate }: Props) {
   )
   return snapshot.game ? (
     <main className="screen">
+      <h1 className="sr-only">Partida online</h1>
       {offline}
       <Game snapshot={snapshot} room={room} home={home} />
     </main>
@@ -93,16 +98,24 @@ function JoinForm({
   target: number
   onJoin: (name: string) => Promise<void>
 }) {
+  const nameField = useRef<HTMLInputElement>(null)
   const [name, setName] = useState(savedName)
   const [error, setError] = useState<string | null>(null)
   const [busy, setBusy] = useState(false)
 
+  const invalidName = error !== null && !cleanName(name)
+
   async function submit(e: FormEvent) {
     e.preventDefault()
     const clean = cleanName(name)
-    if (!clean) return setError('Poné un nombre de 1 a 20 caracteres.')
+    if (!clean) {
+      setError('Poné un nombre de 1 a 20 caracteres.')
+      nameField.current?.focus()
+      return
+    }
     saveName(clean)
     setBusy(true)
+    setError(null)
     await onJoin(clean).catch(() => setError('No pudimos entrar. Probá de nuevo.'))
     setBusy(false)
   }
@@ -119,17 +132,25 @@ function JoinForm({
       <label className="field">
         Tu nombre
         <input
+          ref={nameField}
+          name="nickname"
+          spellCheck={false}
+          aria-invalid={invalidName}
+          aria-describedby={invalidName ? 'join-name-error' : undefined}
           value={name}
           maxLength={20}
           autoComplete="nickname"
-          onChange={(e) => setName(e.target.value)}
+          onChange={(e) => {
+            setName(e.target.value)
+            setError(null)
+          }}
         />
       </label>
-      <button type="submit" className="btn btn-primary" disabled={busy}>
-        Entrar
+      <button type="submit" className="btn btn-primary" disabled={busy} aria-busy={busy}>
+        {busy ? 'Entrando…' : 'Entrar'}
       </button>
       {error && (
-        <p role="alert" className="alert">
+        <p id="join-name-error" role="alert" className="alert">
           {error}
         </p>
       )}
@@ -143,7 +164,9 @@ function Waiting({ roomId, snapshot }: { roomId: string; snapshot: RoomSnapshot 
   const canShare = typeof navigator.share === 'function'
   return (
     <main className="page">
-      <h1 className="page-title">Truquito</h1>
+      <h1 className="page-title" data-page-title="Sala online">
+        Truquito
+      </h1>
       <section className="panel" aria-labelledby="waiting">
         <h2 id="waiting">
           <Hourglass aria-hidden="true" /> Esperando a tu rival
@@ -187,6 +210,9 @@ function Waiting({ roomId, snapshot }: { roomId: string; snapshot: RoomSnapshot 
           <span className="tag">a {snapshot.config.target}</span>
         </p>
       </section>
+      <Link className="btn btn-quiet" href="/">
+        <House aria-hidden="true" /> Volver al inicio
+      </Link>
       <p role="status" className="sr-only">
         {copied ? 'Link copiado.' : ''}
       </p>

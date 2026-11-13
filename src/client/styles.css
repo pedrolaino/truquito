@@ -327,8 +327,10 @@ button.card {
   transition: transform 140ms var(--ease-out);
 }
 
-button.card:hover:not(:disabled) {
-  transform: translateY(-6px);
+@media (hover: hover) {
+  button.card:hover:not(:disabled) {
+    transform: translateY(-6px);
+  }
 }
 
 button.card:disabled {
@@ -1422,7 +1424,9 @@ button.card:disabled {
   height: 100%;
   border-radius: inherit;
   background: var(--accent);
-  transition: width 400ms var(--ease-out);
+  width: 100%;
+  transform-origin: left;
+  transition: transform 400ms var(--ease-out);
 }
 
 .lesson-step {
@@ -1434,7 +1438,7 @@ button.card:disabled {
   animation: step-in 320ms var(--ease-out) both;
 }
 
-.lesson-step h1 {
+.lesson-step h2 {
   font-size: 30px;
   font-weight: 800;
   letter-spacing: -0.5px;
@@ -1627,7 +1631,9 @@ button.card:disabled {
 
 .card.suggested,
 .btn.suggested {
-  animation: nudge 1.4s ease-in-out infinite;
+  animation: nudge 500ms var(--ease-out) 3;
+  outline: 3px solid var(--accent);
+  outline-offset: 2px;
 }
 
 .lesson-done {
@@ -1674,24 +1680,8 @@ button.card:disabled {
 }
 
 @keyframes nudge {
-  0%,
-  100% {
-    box-shadow:
-      3px 3px 0 var(--ink),
-      0 0 0 0 color-mix(in srgb, var(--accent) 60%, transparent);
-  }
   50% {
-    box-shadow:
-      3px 3px 0 var(--ink),
-      0 0 0 6px color-mix(in srgb, var(--accent) 35%, transparent);
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .card.suggested,
-  .btn.suggested {
-    outline: 3px solid var(--accent);
-    outline-offset: 2px;
+    transform: translateY(-3px);
   }
 }
 
@@ -1942,10 +1932,13 @@ button.card:disabled {
   background: none;
   text-align: left;
   cursor: pointer;
+  text-decoration: none;
 }
 
-.learn-row:hover {
-  background: color-mix(in srgb, var(--line) 30%, transparent);
+@media (hover: hover) {
+  .learn-row:hover {
+    background: color-mix(in srgb, var(--line) 30%, transparent);
+  }
 }
 
 .learn-row > svg {
@@ -2289,7 +2282,7 @@ button.card:disabled {
     min-height: 320px;
   }
 
-  .lesson-step h1 {
+  .lesson-step h2 {
     font-size: 40px;
   }
 
@@ -2446,7 +2439,7 @@ button.card:disabled {
     padding-bottom: 16px;
   }
 
-  .lesson-step h1 {
+  .lesson-step h2 {
     font-size: 32px;
   }
 
@@ -2637,4 +2630,193 @@ button.card:disabled {
   .screen .lesson-play .rival {
     justify-content: center;
   }
+}
+
+/* A short route from the front door to a first hand. */
+.home {
+  gap: 20px;
+  padding-top: 20px;
+}
+.home-intro,
+.home-play {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.home .hero-cards .card {
+  --card-w: 44px;
+}
+.home .lead {
+  margin: 0;
+}
+.home-links {
+  display: flex;
+  gap: 10px;
+}
+.home-links .btn {
+  flex: 1;
+  font-size: 14px;
+}
+.home .panel {
+  border-color: var(--line);
+  box-shadow: none;
+}
+.game-settings {
+  font-size: 13px;
+  color: var(--muted);
+}
+.rules-choices {
+  display: grid;
+  gap: 12px;
+}
+.field input {
+  font-size: 16px;
+}
+[aria-invalid='true'] {
+  border-color: var(--accent);
+}
+.player-name,
+.learn-text {
+  min-width: 0;
+}
+h1,
+h2,
+h3 {
+  text-wrap: balance;
+}
+.team-points,
+.puntas-count,
+.final-score {
+  font-variant-numeric: tabular-nums;
+}
+button,
+a,
+input,
+select,
+summary {
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: rgb(199 67 30 / 0.18);
+}
+@media (hover: hover) {
+  .btn:hover:not(:disabled),
+  .icon-btn:hover,
+  .guide-toggle:hover,
+  .sound-toggle:hover,
+  .round-info:hover,
+  .back:hover,
+  .tip-btn:hover {
+    background: var(--ink);
+    color: var(--card);
+    border-color: var(--ink);
+  }
+  .btn-primary:hover:not(:disabled) {
+    background: #a93618;
+  }
+}
+.lesson-position {
+  flex: 1;
+  min-width: 0;
+  display: grid;
+  gap: 6px;
+}
+.lesson-position h1 {
+  font-family: var(--font-body);
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1.2;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.lesson-position .lesson-progress {
+  height: 6px;
+}
+.lesson-position-title {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+.lesson-position-title h1 {
+  flex: 1;
+}
+.lesson-position small {
+  flex: none;
+  font-size: 12px;
+  font-weight: 400;
+  color: var(--muted);
+}
+.skip-link {
+  position: fixed;
+  top: 8px;
+  left: 8px;
+  z-index: 20;
+  transform: translateY(-200%);
+}
+.skip-link:focus {
+  transform: none;
+}
+.tip-btn {
+  min-height: 32px;
+}
+@media (min-width: 900px) {
+  .home {
+    max-width: 1180px;
+    display: grid;
+    grid-template-columns: minmax(300px, 380px) minmax(0, 1fr);
+    gap: 64px;
+    padding-top: 48px;
+    align-items: start;
+  }
+  .home-intro {
+    gap: 24px;
+  }
+  .home .hero-cards .card {
+    --card-w: 80px;
+  }
+  .home .page-title {
+    font-size: 64px;
+  }
+  .home-links {
+    flex-direction: column;
+  }
+  .home-links .btn {
+    font-size: 16px;
+  }
+  .rules-choices {
+    grid-template-columns: 1fr 1fr;
+  }
+  .lesson-position h1 {
+    font-size: 15px;
+  }
+}
+@media (min-width: 900px) and (max-width: 1179px) {
+  .learn-hub {
+    grid-template-columns: 300px minmax(0, 1fr);
+    column-gap: 32px;
+  }
+  .learn-hub > .learn-path {
+    columns: 1;
+  }
+  .home {
+    column-gap: 32px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .lesson-progress span,
+  .card.suggested,
+  .btn.suggested {
+    animation: none;
+    transition: none;
+  }
+}
+
+.back {
+  text-decoration: none;
+}
+
+/* Route headings receive focus for reading, while controls keep their focus rings. */
+h1[tabindex='-1']:focus,
+h2[tabindex='-1']:focus,
+main[tabindex='-1']:focus {
+  outline: none;
 }
