@@ -14,7 +14,8 @@ import { CardBack, CardButton, CardView } from './Card.tsx'
 import { Fosforos } from './Fosforos.tsx'
 import { actionLabel, eventText, scoreText } from './text.ts'
 import { useEffect, useState } from 'react'
-import { CircleHelp, Volume2, VolumeX } from 'lucide-react'
+import { CircleHelp, Volume2, VolumeX, X } from 'lucide-react'
+import { Modal } from './Modal.tsx'
 import { GuideSheet } from './learn/GuideSheet.tsx'
 import { playSound, playTurn } from './sound.ts'
 import { saveMuted, savedMuted } from './storage.ts'
@@ -63,6 +64,7 @@ export function Table({
 }: Props) {
   const [muted, setMuted] = useState(savedMuted)
   const [guide, setGuide] = useState(false)
+  const [historyOpen, setHistoryOpen] = useState(false)
   const { view, busy, announcement, shownEvents } = usePresentation(
     realView,
     events,
@@ -97,14 +99,17 @@ export function Table({
   const score = (seat: number, side: string) => (
     <div className={`score ${side}`}>
       <span className="score-name">
-        {names[seat]} <small>{scoreText(view.scores[seat]!, view.config.target)}</small>
+        <span className="player-name" title={names[seat]}>
+          {names[seat]}
+        </span>{' '}
+        <small>{scoreText(view.scores[seat]!, view.config.target)}</small>
       </span>
       <Fosforos points={view.scores[seat]!} target={view.config.target} />
     </div>
   )
 
   return (
-    <section className="game" aria-label="Mesa">
+    <section className={hideScore ? 'game game-practice' : 'game'} aria-label="Mesa">
       {!hideScore && (
         <header className="scorebar" aria-label="Puntos">
           {score(me, 'score-me')}
@@ -130,10 +135,18 @@ export function Table({
           >
             <CircleHelp aria-hidden="true" />
           </button>
-          <p className="round-info">
+          <button
+            type="button"
+            className="round-info"
+            aria-label={`Mano ${view.roundNumber}. Últimas jugadas`}
+            onClick={() => setHistoryOpen(true)}
+          >
             <b>Mano {view.roundNumber}</b>A {view.config.target},{' '}
             {view.config.flor ? 'con flor' : 'sin flor'}
-          </p>
+            <span className="round-stake">
+              En juego: {round.truco.level} {round.truco.level === 1 ? 'punto' : 'puntos'}
+            </span>
+          </button>
           {score(rival, 'score-rival')}
         </header>
       )}
@@ -146,7 +159,10 @@ export function Table({
             ))}
           </div>
           <p className="rival-name">
-            {names[rival]} {round.mano === rival && <span className="tag">mano</span>}
+            <span className="rival-label" title={names[rival]}>
+              {names[rival]}
+            </span>{' '}
+            {round.mano === rival && <span className="tag">mano</span>}
             {rivalStatus}
           </p>
           {announcement?.seat === rival && (
@@ -170,6 +186,7 @@ export function Table({
               const myCard = trick?.cards[me]
               return (
                 <li key={`${view.roundNumber}-${i}`} className="trick" aria-label={`Baza ${i + 1}`}>
+                  <span className="trick-label">{i + 1}.ª baza</span>
                   <div className={`slot from-rival${outcome(rival)}`}>
                     {rivalCard && <CardView card={rivalCard} />}
                   </div>
@@ -278,6 +295,30 @@ export function Table({
           <p key={lines.length - 14 + i}>{line}</p>
         ))}
       </aside>
+      {historyOpen && (
+        <Modal titleId="history-title" onClose={() => setHistoryOpen(false)}>
+          <section className="panel history-panel">
+            <div className="sheet-head">
+              <h2 id="history-title" tabIndex={-1}>
+                Últimas jugadas
+              </h2>
+              <button
+                type="button"
+                className="icon-btn"
+                aria-label="Cerrar jugadas"
+                onClick={() => setHistoryOpen(false)}
+              >
+                <X aria-hidden="true" />
+              </button>
+            </div>
+            {lines.length ? (
+              lines.slice(-14).map((line, i) => <p key={i}>{line}</p>)
+            ) : (
+              <p>Todavía no hubo jugadas.</p>
+            )}
+          </section>
+        </Modal>
+      )}
       {!busy && over}
       {guide && <GuideSheet onClose={() => setGuide(false)} />}
       <div className="sr-only" aria-live="polite">

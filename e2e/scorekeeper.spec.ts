@@ -22,6 +22,11 @@ test('keeps the score of a real game and survives a reload', async ({ page }) =>
   await expect(nosotros).toBeDisabled()
 
   await page.getByRole('button', { name: 'Nueva partida' }).click()
+  const reset = page.getByRole('dialog', { name: '¿Empezar de nuevo?' })
+  await reset.getByRole('button', { name: 'Seguir jugando' }).click()
+  await expect(nosotros).toContainText('15 buenas')
+  await page.getByRole('button', { name: 'Nueva partida' }).click()
+  await reset.getByRole('button', { name: 'Nueva partida' }).click()
   await expect(page.getByRole('button', { name: 'A 15' })).toBeVisible()
 })
 

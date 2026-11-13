@@ -5,6 +5,7 @@ import { seededRandom } from '../bots/match.ts'
 import { type GameConfig, viewFor } from '../engine/game.ts'
 import { BOT, BotGame, HUMAN } from './botGame.ts'
 import { decideInWorker } from './decide.ts'
+import { ConfirmDialog } from './ConfirmDialog.tsx'
 import { GameOver } from './GameOver.tsx'
 import { Table } from './Table.tsx'
 
@@ -33,6 +34,7 @@ export function BotMatch({
   config: GameConfig
   onExit: () => void
 }) {
+  const [exiting, setExiting] = useState(false)
   const [game, setGame] = useState(() => newGame(level, config))
   useEffect(() => () => game.dispose(), [game])
   const { state, events, failed } = useSyncExternalStore(game.subscribe, game.getSnapshot)
@@ -69,12 +71,21 @@ export function BotMatch({
         }
         rivalStatus={
           state.winner === null && (
-            <button type="button" className="btn btn-quiet" onClick={onExit}>
+            <button type="button" className="btn btn-quiet" onClick={() => setExiting(true)}>
               Salir
             </button>
           )
         }
       />
+      {exiting && (
+        <ConfirmDialog
+          title="¿Salir de la partida?"
+          detail="Esta partida contra el bot no se guarda."
+          confirm="Salir"
+          onCancel={() => setExiting(false)}
+          onConfirm={onExit}
+        />
+      )}
     </main>
   )
 }
