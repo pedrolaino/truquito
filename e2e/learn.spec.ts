@@ -9,8 +9,11 @@ test('the quick guide opens from the menu and over a game', async ({ page }) => 
     'Qué carta gana',
     'Cómo se cuenta el envido',
     'Cuánto vale cada canto',
+    'Las señas',
   ])
-  await expect(page.getByRole('img', { name: '1 de espada', exact: true })).toBeVisible()
+  await expect(
+    page.locator('.ranking').getByRole('img', { name: '1 de espada', exact: true }),
+  ).toBeVisible()
 
   await page.goto('/')
   await page.getByLabel('Tu nombre').fill('Ana')
