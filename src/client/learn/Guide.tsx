@@ -105,10 +105,6 @@ function Calls({ practice = false }: { practice?: boolean }) {
         La falta envido no se suma a lo cantado antes: vale lo que le falta al que va ganando. A 15,
         con 12 a 8, vale 3.
       </p>
-      <p className="guide-rule">
-        <strong>Regla de esta mesa:</strong> al 4 no se le canta truco. Si el rival tiró un 4, el
-        truco espera hasta que tires tu carta.
-      </p>
       {practice && (
         <Link className="btn btn-quiet" href="/aprender/truco">
           Probar: cantar truco
@@ -165,15 +161,85 @@ function Envido({ practice = false }: { practice?: boolean }) {
   )
 }
 
-export type GuideSection = 'cartas' | 'envido' | 'cantos'
+const SIGNALS: { name: string; gesture: string; cards: Card[] }[] = [
+  { name: '1 de espada', gesture: 'Levantá las cejas.', cards: [c(1, 'espada')] },
+  { name: '1 de basto', gesture: 'Guiñá un ojo.', cards: [c(1, 'basto')] },
+  { name: '7 de espada', gesture: 'Mové los labios hacia tu derecha.', cards: [c(7, 'espada')] },
+  { name: '7 de oro', gesture: 'Mové los labios hacia tu izquierda.', cards: [c(7, 'oro')] },
+  {
+    name: 'Cualquier 3',
+    gesture: 'Mordete el labio inferior.',
+    cards: [c(3, 'copa'), c(3, 'oro'), c(3, 'espada'), c(3, 'basto')],
+  },
+  {
+    name: 'Cualquier 2',
+    gesture: 'Fruncí los labios hacia adelante, como para dar un beso.',
+    cards: [c(2, 'copa'), c(2, 'oro'), c(2, 'espada'), c(2, 'basto')],
+  },
+  {
+    name: '1 de oro o 1 de copa',
+    gesture: 'Abrí un poco la boca.',
+    cards: [c(1, 'oro'), c(1, 'copa')],
+  },
+  { name: 'Malas cartas', gesture: 'Cerrá los ojos.', cards: [] },
+  { name: 'Buen envido', gesture: 'Incliná la cabeza hacia adelante o hacia un lado.', cards: [] },
+]
+
+function Signals() {
+  return (
+    <section className="guide-section signals-section" aria-labelledby="guide-senas">
+      <h2 id="guide-senas">Las señas</h2>
+      <p className="guide-note">
+        En partidas de 4 o 6, las señas les cuentan a tus compañeros qué cartas tenés. No hacen
+        falta en el uno contra uno de Truquito: esta referencia también te sirve para jugar con
+        cartas de verdad.
+      </p>
+      <p className="guide-note">
+        Estas son señas habituales. Pueden variar según la mesa: acuerden cuáles van a usar. La
+        derecha y la izquierda son las de quien hace la seña. Ojo: los rivales también pueden verla.
+      </p>
+      <dl className="signals-list">
+        {SIGNALS.map(({ name, gesture, cards }) => (
+          <div key={name} className="signal-row">
+            <dt>{name}</dt>
+            <dd>
+              {cards.length > 0 && (
+                <span className="signal-cards" aria-hidden="true">
+                  {cards.map((card) => (
+                    <CardView key={cardName(card)} card={card} />
+                  ))}
+                </span>
+              )}
+              <span>{gesture}</span>
+            </dd>
+          </div>
+        ))}
+      </dl>
+      <p className="guide-note">
+        Fuente:{' '}
+        <a
+          href="https://www.casi.com.ar/sites/default/files/Reglamento%20Truco.pdf"
+          target="_blank"
+          rel="noreferrer"
+        >
+          Reglamento de truco del CASI (PDF, sección 16)
+        </a>
+        .
+      </p>
+    </section>
+  )
+}
+
+export type GuideSection = 'cartas' | 'envido' | 'cantos' | 'senas'
 
 const SECTIONS: [GuideSection, string][] = [
   ['cartas', 'Cartas'],
   ['envido', 'Envido'],
   ['cantos', 'Cantos'],
+  ['senas', 'Señas'],
 ]
 
-/** Quick reference: card ranking, envido counting and call values. Opens at `section`. */
+/** Quick reference: card ranking, envido, calls and partner signals. Opens at `section`. */
 export function GuideContent({
   section,
   page = false,
@@ -221,6 +287,7 @@ export function GuideContent({
       <Ranking practice={page} />
       <Envido practice={page} />
       <Calls practice={page} />
+      <Signals />
     </div>
   )
 }
