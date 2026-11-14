@@ -261,7 +261,15 @@ export function GuideContent({
   }
   useEffect(() => {
     const id = section ?? (page ? location.hash.replace('#guide-', '') : '')
-    if (SECTIONS.some(([key]) => key === id)) go(id as GuideSection, false)
+    if (!SECTIONS.some(([key]) => key === id)) return
+    let cancelled = false
+    // Font loading changes section heights, especially on narrow screens.
+    void document.fonts.ready.then(() => {
+      if (!cancelled) go(id as GuideSection, false)
+    })
+    return () => {
+      cancelled = true
+    }
   }, [section, page])
 
   return (

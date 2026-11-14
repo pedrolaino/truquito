@@ -26,6 +26,10 @@ test('an incomplete row of large quiz cards is centered on phones', async ({ pag
 test('partner signals are available in the guide and during play', async ({ page }) => {
   await page.setViewportSize({ width: 320, height: 568 })
   await page.emulateMedia({ reducedMotion: 'reduce' })
+  await page.route('**/*.woff2', async (route) => {
+    await new Promise((resolve) => setTimeout(resolve, 500))
+    await route.continue()
+  })
   await page.goto('/aprender/guia#guide-senas')
   await expect(page.getByRole('link', { name: 'Señas', exact: true })).toHaveAttribute(
     'aria-current',
