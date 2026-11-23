@@ -11,16 +11,33 @@ Argentine truco in the browser, against a bot or one on one with a friend throug
 
 ## Features
 
-- Play against a bot on easy, medium or hard. Bot games run in your browser and need no name. The home page puts local play first, with the online name field kept beside room creation.
-- Play online 1 on 1: create a room, send the link, and the game starts when your friend joins. Players only need a name.
-- The table adapts to portrait and landscape screens. Tap the hand number to see recent plays, and keep the current hand value beside the scores. Leaving a local game or clearing the scorekeeper asks for confirmation.
-- If your connection drops, reopening the link gives you your seat back. Your opponent sees that you are away and wins by abandonment after two minutes.
+### Play
+
+- Play against a bot on easy, medium or hard. Bot games run in your browser and you don't need to enter a name.
+- Play online one on one. Create a room, send the link, and the game starts when your friend joins. Each player only needs a name.
+- If your connection drops, open the link again to get your seat back. Your opponent sees that you are away and wins by abandonment after two minutes.
 - Both players can ask for a rematch in the same room.
-- Each room is played with or without flor, to 15 or 30 points. At 30 the score reads as _malas_ and _buenas_.
-- The scorekeeper keeps the score of a game with real cards: tap _Nosotros_ or _Ellos_ to add a point. It draws the score with matchsticks, four in a square and a fifth across it, the way Argentine players keep score.
-- For _puntas_, a popup over the scorekeeper counts each team's points on their own; when you finish, the difference goes to the team that made more.
-- New to truco? _Aprender a jugar_ has a quick guide (the card ranking, how to count envido and what each call is worth, with a jump to each part), a path of eleven short lessons in five stages (plus an optional one on the flor) where you play hands, make your own choices with a hint when you want one, and get another try when an answer is wrong, and a practice game against the easy bot with a coach: it suggests moves always, only when asked, or never, says why when asked, and reviews one card choice after each hand. The guide is also one tap away during any game, with keyboard focus kept inside it, direct links to its sections on the guide page, and a larger view of the cards. Card ranking, envido and call topics link to practice lessons. The guide also covers nine common partner signals from the CASI rules, with card illustrations, both on its own page and during a game. Lessons keep their name and step number visible, and keyboard focus follows each new question.
-- The layout is designed for phones first. You can play with a keyboard, screen readers announce every call and card, and the animations switch off when your system asks for reduced motion.
+- Each room plays with or without flor, to 15 or 30 points. At 30 the score reads as _malas_ and _buenas_.
+- The table works in portrait and landscape. The value of the current hand sits next to the scores, and tapping the hand number shows the recent plays. Leaving a game against the bot asks for confirmation.
+
+### Keep score
+
+- The scorekeeper is for games with real cards. Tap _Nosotros_ or _Ellos_ to add a point. The score is drawn with matchsticks, four in a square and a fifth across it, the way Argentine players keep score. Clearing it asks for confirmation.
+- For _puntas_, a popup counts each team's points separately. When you finish, the difference goes to the team that made more.
+
+### Learn
+
+_Aprender a jugar_ is for people who have never played.
+
+- Eleven short lessons in five stages, plus an optional one on the flor. You play real hands and pick your own moves, with a hint if you ask for one. A wrong answer gets a clue and another try. Each lesson shows its name and step number.
+- A practice game against the easy bot with a coach. It can suggest every move, only the ones you ask about, or none. It explains its advice when you ask why, and after each hand it points out one card choice.
+- A quick guide with the card ranking, how to count envido, what each call is worth and nine common partner signals from the CASI rules. It links to each of its sections and to the lessons on each topic, shows the cards larger, and opens over any game without leaving the table.
+
+### Phones, computers and accessibility
+
+- The layout is made for phones first, with its own layout on computers.
+- You can play with a keyboard, and screen readers announce every call and card. Focus stays inside the guide while it is open and moves to each new lesson question.
+- Animations switch off when your system asks for reduced motion.
 
 ![The game table on a laptop, with the play log on the side](docs/images/desktop.png)
 
